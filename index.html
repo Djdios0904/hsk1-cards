@@ -121,6 +121,7 @@ footer .warn{color:var(--cinnabar)}
         <button type="button" data-v="zh" aria-pressed="true">汉字 → EN</button>
         <button type="button" data-v="en" aria-pressed="false">EN → 汉字</button>
       </div>
+      <button type="button" class="chip" id="autoBtn" aria-pressed="false" title="Play the word automatically when the card flips">🔊 Auto-play</button>
     </div>
   </div>
 
@@ -242,7 +243,7 @@ function faceZh(c){ return `<span class="tag">第${c.l}课</span><div class="emo
 function faceEn(c){ return `<span class="tag">Lesson ${c.l}</span><div class="emoji">${c.em}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en big">${esc(c.en)}</div><span class="hint">Say it in Chinese, then flip</span>`; }
 function answerZh(c){ return `<span class="tag">第${c.l}课</span><span class="tag r">${esc(c.hz)}</span><div class="py">${esc(c.py)}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en">${esc(c.en)}</div>${speakBtn()}`; }
 function answerEn(c){ return `<span class="tag">Lesson ${c.l}</span><div class="hz" style="font-size:${Math.round(hzSize(c.hz)*.8)}px">${esc(c.hz)}</div><div class="py">${esc(c.py)}</div><div class="en">${esc(c.en)}</div>${speakBtn()}`; }
-const speakBtn = () => voiceOK ? `<span class="speak" role="button" tabindex="0" data-speak>🔊 Hear it</span>` : '';
+const speakBtn = () => `<span class="speak" role="button" tabindex="0" data-speak>🔊 Hear it <span class="keys">· S</span></span>`;
 
 function render(){
   renderStats();
@@ -296,7 +297,7 @@ function renderDone(){
   if (moreNew) $('more').onclick = () => { queue = sel.filter(isNew).slice(0, NEW_PER_SESSION); pos=0; sessionTotal=queue.length; sessionDone=0; againCount=0; flipped=false; render(); };
 }
 
-function flip(){ flipped = !flipped; render(); if (flipped && autoSpeak) speak(queue[pos]); }
+function flip(){ flipped = !flipped; render(); if (flipped && autoSpeakOn()) speak(queue[pos]); if (flipped) preload(); }
 function go(d){ pos = Math.min(queue.length-1, Math.max(0, pos+d)); flipped=false; render(); }
 function answer(g){
   const c = queue[pos];
@@ -306,21 +307,28 @@ function answer(g){
   pos++; flipped = false; render();
 }
 
-// ---------- audio ----------
-let zhVoice = null, voiceOK = false, autoSpeak = false;
-function loadVoices(){
+// ---------- audio (pre-recorded mp3 per card; device voice only as fallback) ----------
+const player = new Audio(); player.preload = 'auto';
+let voiceOK = true;
+function deviceSpeak(c){
   try{
     const vs = speechSynthesis.getVoices();
-    zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
-    const was = voiceOK; voiceOK = !!zhVoice;
-    if (was !== voiceOK && queue.length) render();
+    const v = vs.find(x => /zh[-_]CN/i.test(x.lang)) || vs.find(x => /^zh/i.test(x.lang));
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(c.hz); u.lang = v ? v.lang : 'zh-CN'; if (v) u.voice = v; u.rate = .8;
+    speechSynthesis.speak(u);
   }catch(e){}
 }
 function speak(c){
-  if (!voiceOK) return;
-  try{ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(c.hz); u.voice = zhVoice; u.lang = zhVoice.lang; u.rate = .8; speechSynthesis.speak(u); }catch(e){}
+  if (!c) return;
+  try{
+    player.pause(); player.src = 'audio/' + c.id + '.mp3'; player.currentTime = 0;
+    const pr = player.play(); if (pr && pr.catch) pr.catch(() => deviceSpeak(c));
+  }catch(e){ deviceSpeak(c); }
 }
-if ('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+player.addEventListener('error', () => { if (queue[pos]) deviceSpeak(queue[pos]); });
+const autoSpeakOn = () => !!settings.auto;
+function preload(){ const n = queue[pos+1]; if (n){ const a = new Audio(); a.preload='auto'; a.src='audio/'+n.id+'.mp3'; } }
 
 document.addEventListener('click', e => {
   const sp = e.target.closest('[data-speak]');
@@ -335,7 +343,7 @@ document.addEventListener('keydown', e => {
   else if (settings.mode === 'review' && flipped && '1234'.includes(e.key)) answer(+e.key - 1);
   else if (settings.mode === 'browse' && e.key === 'ArrowRight') go(1);
   else if (settings.mode === 'browse' && e.key === 'ArrowLeft') go(-1);
-  else if ((e.key === 's' || e.key === 'S') && flipped) speak(queue[pos]);
+  else if (e.key === 's' || e.key === 'S') speak(queue[pos]);
 });
 
 // swipe on touch: left = next/good, right = prev/again (only after flip in review)
@@ -358,6 +366,7 @@ function bindReset(){
 function restoreReset(){ $('resetWrap').innerHTML = `<button type="button" id="resetBtn">Reset progress</button>`; bindReset(); }
 bindReset();
 
+$('autoBtn').setAttribute('aria-pressed', !!settings.auto); $('autoBtn').onclick = () => { settings.auto = !settings.auto; persist(); $('autoBtn').setAttribute('aria-pressed', settings.auto); };
 renderLessons(); setSeg('mode','mode'); setSeg('dir','dir'); buildSession();
 </script>
 
