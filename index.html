@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HSK 1 Cards</title>
+<meta name="description" content="Spaced-repetition flashcards for all 318 HSK 1 words, with audio.">
+<meta name="theme-color" content="#1E7A62">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans:ital,wght@0,400;0,600;0,800;1,400&display=swap">
+<style>
+/* Layout: one-column study desk — deck controls up top, a single large card, grading bar under it */
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#16201C; --muted:#5E6E68; --line:#D3DCD8;
+  --jade:#1E7A62; --jade-soft:#D9EDE6; --cinnabar:#C2412F; --amber:#B7791F; --sky:#2F6FA8;
+  --hz:'Noto Serif SC','Songti SC','SimSun',serif;
+  --ui:'Noto Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --emoji:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111816; --surface:#1A2420; --ink:#E7EEEB; --muted:#93A59E; --line:#2C3A35;
+  --jade:#4FBF9C; --jade-soft:#1E3A31; --cinnabar:#E8705D; --amber:#E0A84A; --sky:#6AA8E0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111816; --surface:#1A2420; --ink:#E7EEEB; --muted:#93A59E; --line:#2C3A35;
+  --jade:#4FBF9C; --jade-soft:#1E3A31; --cinnabar:#E8705D; --amber:#E0A84A; --sky:#6AA8E0; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px;min-height:100%}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--hz);font-weight:900;font-size:26px;margin:0;letter-spacing:.02em}
+h1 small{font-family:var(--ui);font-weight:600;font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-left:8px}
+.stats{display:flex;gap:14px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink);font-weight:800}
+.stats .due b{color:var(--jade)}
+.panel{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lbl{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-width:56px}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:999px;padding:5px 11px;cursor:pointer;font-variant-numeric:tabular-nums;line-height:1.2}
+.chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--surface)}
+.chip:focus-visible,.btn:focus-visible,.card:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.lessons{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;flex:1}
+.lessons .chip{padding:5px 0;text-align:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.progress{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--jade);width:0;transition:width .25s}
+.meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.stage{perspective:1400px}
+.card{position:relative;width:100%;aspect-ratio:4/4.4;max-height:58vh;min-height:300px;cursor:pointer;border:0;padding:0;background:none;
+  transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.2,1);display:block;font:inherit;color:inherit;max-width:100%}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);
+  border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px 22px;text-align:center;gap:10px;overflow:hidden}
+.face::before{content:"";position:absolute;inset:12px;border:1px solid var(--line);border-radius:11px;pointer-events:none;opacity:.6}
+.back{transform:rotateY(180deg)}
+.tag{position:absolute;top:22px;left:24px;font-size:12px;font-weight:600;color:var(--jade);letter-spacing:.04em}
+.tag.r{left:auto;right:24px;color:var(--muted);font-weight:400}
+.emoji{font-family:var(--emoji);font-size:56px;line-height:1}
+.hz{font-family:var(--hz);font-weight:900;line-height:1.05;letter-spacing:.02em;white-space:nowrap}
+.py{font-size:34px;font-weight:800;color:var(--jade);line-height:1.15}
+.pos{font-size:13px;font-style:italic;color:var(--muted)}
+.en{font-size:21px;line-height:1.3;max-width:28ch;text-wrap:balance}
+.en.big{font-size:28px;font-weight:600}
+.hint{font-size:12px;color:var(--muted);position:absolute;bottom:24px}
+.small-hz{font-family:var(--hz);font-weight:600;font-size:40px;line-height:1}
+.speak{font:inherit;font-size:13px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;margin-top:6px}
+.speak[hidden]{display:none}
+
+.grade{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.btn{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 4px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:600;font-size:14px}
+.btn span{font-size:11px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.btn.again{border-color:color-mix(in srgb,var(--cinnabar) 55%,var(--line));color:var(--cinnabar)}
+.btn.hard{color:var(--amber)}
+.btn.good{background:var(--jade);border-color:var(--jade);color:var(--surface)}
+.btn.good span{color:var(--surface);opacity:.85}
+.btn.easy{color:var(--sky)}
+.btn.wide{grid-column:span 4;flex-direction:row;justify-content:center;padding:13px;font-size:15px}
+.nav{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px}
+.done{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.done .big{font-family:var(--hz);font-size:64px;font-weight:900;line-height:1}
+.done p{margin:0;color:var(--muted);max-width:36ch;line-height:1.5}
+footer{margin-top:auto;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding-top:6px}
+footer button{font:inherit;font-size:12px;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+footer .warn{color:var(--cinnabar)}
+.keys{display:none}
+@media (hover:hover) and (pointer:fine){.keys{display:inline}}
+@media (max-width:520px){.lessons{grid-template-columns:repeat(5,1fr)}.panel>.row:first-child{flex-direction:column;align-items:stretch}.lessons{width:100%}.py{font-size:30px}.emoji{font-size:48px}}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head><body>
+
+
+<div class="wrap">
+  <header>
+    <h1>汉语卡片<small>HSK 1</small></h1>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="panel">
+    <div class="row"><span class="lbl">Lessons</span><div class="lessons" id="lessons"></div></div>
+    <div class="row">
+      <span class="lbl">Mode</span>
+      <div class="seg" id="mode">
+        <button type="button" data-v="review" aria-pressed="true">Review</button>
+        <button type="button" data-v="browse" aria-pressed="false">Browse</button>
+      </div>
+      <div class="seg" id="dir">
+        <button type="button" data-v="zh" aria-pressed="true">汉字 → EN</button>
+        <button type="button" data-v="en" aria-pressed="false">EN → 汉字</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress"><i id="bar"></i></div>
+  <div class="meta"><span id="metaL"></span><span id="metaR"></span></div>
+
+  <div id="studyArea">
+    <div class="stage">
+      <div class="card" id="card" role="button" tabindex="0" aria-label="Flip card">
+        <div class="face front" id="front"></div>
+        <div class="face back" id="back"></div>
+      </div>
+    </div>
+  </div>
+  <div id="doneArea" hidden></div>
+
+  <div id="controls"></div>
+
+  <footer>
+    <span>Progress is saved in this browser only.</span>
+    <span id="resetWrap"><button type="button" id="resetBtn">Reset progress</button></span>
+  </footer>
+</div>
+
+<script>
+const RAW = [[1,"你好","nǐ hǎo","","hello","👋"],[1,"请问","qǐng wèn","v.","excuse me (may I ask)","🙋"],[1,"你","nǐ","pron.","you (singular)","👉"],[1,"好","hǎo","adj.","good; fine","👍"],[1,"叫","jiào","v.","to be called","📛"],[1,"什么","shénme","pron.","what","❓"],[1,"名字","míngzi","n.","name","🏷️"],[1,"我","wǒ","pron.","I; me","🙋‍♂️"],[1,"老师","lǎoshī","n.","teacher","👩‍🏫"],[1,"不","bù","adv.","not; no","🚫"],[1,"是","shì","v.","to be","🟰"],[1,"对不起","duìbuqǐ","v.","sorry","🙇"],[1,"没关系","méi guānxi","","that's all right; never mind","🤝"],[1,"没事","méishì","v.","it doesn't matter","😌"],[1,"谢谢","xièxie","v.","thank you","🙏"],[1,"不客气","bú kèqi","","you're welcome","😊"],[1,"同学","tóngxué","n.","classmate","🧑‍🎓"],[1,"再见","zàijiàn","v.","goodbye","👋"],[2,"人","rén","n.","person; human","🧍"],[2,"的","de","part.","possessive / attributive particle","🔗"],[2,"中国","Zhōngguó","","China","🇨🇳"],[2,"法国","Fǎguó","","France","🇫🇷"],[2,"中文","Zhōngwén","","Chinese language","🀄"],[2,"这","zhè","pron.","this","👇"],[2,"谁","shéi / shuí","pron.","who","🕵️"],[2,"女朋友","nǚpéngyou","n.","girlfriend","👩‍❤️‍👨"],[2,"哪","nǎ","pron.","which","🤔"],[2,"国","guó","n.","country","🗺️"],[2,"她","tā","pron.","she; her","👩"],[2,"泰国","Tàiguó","","Thailand","🇹🇭"],[2,"喂","wèi","int.","hello (on phone); hey","📞"],[2,"姐姐","jiějie","n.","elder sister","👧"],[2,"工作","gōngzuò","n.","job","💼"],[2,"还","hái","adv.","still","⏳"],[2,"忙","máng","adj.","busy","😵‍💫"],[2,"吗","ma","part.","question particle (yes/no)","❔"],[2,"对","duì","adj.","right; correct","✅"],[2,"太","tài","adv.","too; excessively","‼️"],[2,"我们","wǒmen","pron.","we; us","👨‍👩‍👧"],[2,"想","xiǎng","v.","to miss (someone)","💭"],[3,"有","yǒu","v.","to have","🎁"],[3,"没有","méiyǒu","v.","to not have","🈳"],[3,"多少","duōshao","pron.","how many; how much","🔢"],[3,"个","gè","m.","general measure word","1️⃣"],[3,"哥哥","gēge","n.","elder brother","👦"],[3,"呢","ne","part.","question particle (\"and…?\")","💬"],[3,"家","jiā","n.","family","👨‍👩‍👧‍👦"],[3,"几","jǐ","pron.","how many (small number)","🖐️"],[3,"口","kǒu","m.","measure word for family members","👄"],[3,"爸爸","bàba","n.","father","👨"],[3,"妈妈","māma","n.","mother","👩‍🍼"],[3,"妹妹","mèimei","n.","younger sister","👧"],[3,"和","hé","conj.","and","➕"],[3,"儿子","érzi","n.","son","👦"],[3,"孩子","háizi","n.","child; children","🧒"],[3,"女儿","nǚ'ér","n.","daughter","👧"],[3,"岁","suì","m.","year (of age)","🎂"],[3,"他","tā","pron.","he; him","👨"],[3,"今年","jīnnián","n.","this year","📅"],[3,"多","duō","pron.","how (to what extent)","📏"],[3,"大","dà","adj.","old (of age)","🧓"],[4,"今天","jīntiān","n.","today","📆"],[4,"号","hào","m.","date (day of month)","🗓️"],[4,"月","yuè","n.","month","🌙"],[4,"日","rì","m.","day (date)","☀️"],[4,"星期","xīngqī","n.","week","📅"],[4,"星期日","xīngqīrì","n.","Sunday","🌞"],[4,"星期天","xīngqītiān","n.","Sunday (spoken)","🌞"],[4,"休息","xiūxi","v.","to rest","🛋️"],[4,"会","huì","mod.","can; be able to (learned skill)","🎯"],[4,"做饭","zuò fàn","","to cook","🍳"],[4,"做","zuò","v.","to make; produce","🛠️"],[4,"面条儿","miàntiáor","n.","noodles","🍜"],[4,"饺子","jiǎozi","n.","dumplings (jiaozi)","🥟"],[4,"一些","yìxiē","num.-m.","some","🤏"],[4,"菜","cài","n.","dish; course","🍲"],[4,"下班","xiàbān","v.","to get off work","🏃"],[4,"新","xīn","adj.","new","🆕"],[4,"电脑","diànnǎo","n.","computer","💻"],[4,"真","zhēn","adv.","really; truly","💯"],[4,"好看","hǎokàn","adj.","good-looking; nice","😍"],[4,"喜欢","xǐhuan","v.","to like","❤️"],[4,"它","tā","pron.","it","🐾"],[5,"手机","shǒujī","n.","cell phone","📱"],[5,"电话","diànhuà","n.","telephone; phone call","☎️"],[5,"号","hào","n.","number","#️⃣"],[5,"明天","míngtiān","n.","tomorrow","⏭️"],[5,"哪儿","nǎr","pron.","where","📍"],[5,"去","qù","v.","to go (to)","🚶"],[5,"想","xiǎng","mod.","to want; would like","🤩"],[5,"买","mǎi","v.","to buy","🛒"],[5,"东西","dōngxi","n.","thing; stuff","📦"],[5,"超市","chāoshì","n.","supermarket","🏪"],[5,"些","xiē","m.","some; a few","🤏"],[5,"牛奶","niúnǎi","n.","(cow's) milk","🥛"],[5,"吃","chī","v.","to eat","🍽️"],[5,"晚饭","wǎnfàn","n.","dinner; supper","🍛"],[5,"包子","bāozi","n.","steamed stuffed bun","🥟"],[5,"那边","nàbiān","pron.","there; over there","👉"],[5,"好吃","hǎochī","adj.","tasty; delicious","😋"],[5,"非常","fēicháng","adv.","very; extremely","🔥"],[5,"米饭","mǐfàn","n.","(cooked) rice","🍚"],[5,"出租车","chūzūchē","n.","taxi","🚕"],[5,"坐","zuò","v.","to travel by (taxi, bus…)","🚌"],[5,"怎么","zěnme","pron.","how (manner)","🧭"],[5,"天津饭店","Tiānjīn Fàndiàn","","Tianjin Restaurant (name)","🏮"],[6,"点","diǎn","m.","o'clock","🕐"],[6,"分","fēn","m.","minute (clock time)","⏱️"],[6,"现在","xiànzài","n.","now","⌚"],[6,"早上","zǎoshang","n.","(early) morning","🌅"],[6,"上午","shàngwǔ","n.","morning (before noon)","🌤️"],[6,"下午","xiàwǔ","n.","afternoon","🌇"],[6,"课","kè","n.","class; lesson","📚"],[6,"见","jiàn","v.","to meet; see","🤝"],[6,"吧","ba","part.","suggestion particle (\"let's…\")","💡"],[6,"看","kàn","v.","to watch; see; read; look at","👀"],[6,"电影","diànyǐng","n.","movie; film","🎬"],[6,"电影院","diànyǐngyuàn","n.","cinema","🎦"],[6,"事","shì","n.","thing; matter; affair","📝"],[6,"上课","shàngkè","v.","to attend class","🏫"],[6,"下课","xiàkè","v.","to finish class","🔔"],[6,"呢","ne","part.","ongoing-state particle (statement)","💬"],[6,"半","bàn","num.","half","◐"],[6,"家","jiā","n.","home","🏠"],[6,"在","zài","v.","to be at / in / on","📍"],[6,"里","lǐ / li","n.","inside","📥"],[6,"晚上","wǎnshang","n.","evening","🌃"],[6,"医院","yīyuàn","n.","hospital","🏥"],[6,"上班","shàngbān","v.","to go to work","🏢"],[6,"店","diàn","n.","shop; store","🏬"],[6,"菜","cài","n.","vegetable; greens","🥬"],[6,"分钟","fēnzhōng","m.","minute (duration)","⏲️"],[6,"后","hòu","n.","after; later","⏩"],[7,"房间","fángjiān","n.","room","🚪"],[7,"外","wài","n.","outside","🌳"],[7,"只","zhī","m.","measure word for animals","🐦"],[7,"小","xiǎo","adj.","small; little","🐭"],[7,"大","dà","adj.","big; large","🐘"],[7,"猫","māo","n.","cat","🐱"],[7,"没","méi","adv.","not; not yet (past)","⛔"],[7,"看见","kànjiàn","v.","to see; catch sight of","👁️"],[7,"桌子","zhuōzi","n.","table; desk","🪑"],[7,"下","xià","n.","below; under","⬇️"],[7,"漂亮","piàoliang","adj.","pretty; beautiful","🌸"],[7,"在","zài","prep.","at; in","📌"],[7,"学校","xuéxiào","n.","school","🏫"],[7,"书店","shūdiàn","n.","bookstore","📖"],[7,"前","qián","n.","front","⬆️"],[7,"能","néng","mod.","can; be able to (possible)","💪"],[7,"到","dào","v.","to arrive; reach","🏁"],[7,"午饭","wǔfàn","n.","lunch","🥪"],[7,"饭","fàn","n.","meal","🍱"],[7,"病人","bìngrén","n.","patient","🤒"],[7,"多","duō","adj.","many; much","🔝"],[7,"医生","yīshēng","n.","doctor","🧑‍⚕️"],[7,"工作","gōngzuò","v.","to work","👷"],[7,"陆医生","Lù yīshēng","","Dr. Lu (name)","🩺"],[8,"边","biān / bian","suf./n.","side; (locality suffix)","↔️"],[8,"前边","qiánbian","n.","front side","⏫"],[8,"家","jiā","m.","measure word for families / businesses","🏪"],[8,"那个","nàge","pron.","that (one)","👉"],[8,"外边","wàibian","n.","outside","🏞️"],[8,"椅子","yǐzi","n.","chair","🪑"],[8,"上","shàng / shang","n.","on; above","⬆️"],[8,"本","běn","m.","measure word for books","📘"],[8,"书","shū","n.","book","📕"],[8,"那","nà","pron.","that","👉"],[8,"第","dì","pref.","ordinal prefix (1st, 2nd…)","🥇"],[8,"学习","xuéxí","v.","to study; learn","✏️"],[8,"做","zuò","v.","to do; engage in","🧰"],[8,"白天","báitiān","n.","daytime","🌞"],[8,"读书","dúshū","v.","to read (books); study","📖"],[8,"和","hé","prep.","with","👫"],[8,"朋友","péngyou","n.","friend","🧑‍🤝‍🧑"],[8,"唱","chàng","v.","to sing","🎤"],[8,"歌","gē","n.","song","🎵"],[8,"好听","hǎotīng","adj.","pleasant to hear","🎶"],[8,"电视","diànshì","n.","television","📺"],[8,"狗","gǒu","n.","dog","🐶"],[8,"玩","wán","v.","to play; have fun","🎮"],[9,"杯子","bēizi","n.","cup; glass","🥤"],[9,"售货员","shòuhuòyuán","n.","shop assistant","🧑‍💼"],[9,"这边","zhèbiān","pron.","here; this side","👇"],[9,"钱","qián","n.","money","💰"],[9,"块","kuài","m.","kuai (spoken unit of money)","💴"],[9,"这些","zhèxiē","pron.","these","👇"],[9,"那些","nàxiē","pron.","those","👉"],[9,"这儿","zhèr","pron.","here","📍"],[9,"苹果","píngguǒ","n.","apple","🍎"],[9,"水果","shuǐguǒ","n.","fruit","🍇"],[9,"少","shǎo","adj.","few; little","🪫"],[9,"便宜","piányi","adj.","cheap","🏷️"],[9,"斤","jīn","m.","jin (½ kg)","⚖️"],[9,"商店","shāngdiàn","n.","shop; store","🛍️"],[9,"衣服","yīfu","n.","clothes","👕"],[9,"件","jiàn","m.","measure word for clothes, items","🧥"],[9,"元","yuán","m.","yuan (formal unit of money)","💴"],[9,"怎么样","zěnmeyàng","pron.","how (is it)?; how about","🤷"],[9,"贵","guì","adj.","expensive","💎"],[9,"穿","chuān","v.","to wear; put on","👗"],[9,"女","nǚ","adj.","female","♀️"],[9,"男","nán","adj.","male","♂️"],[9,"那儿","nàr","pron.","there","📍"],[10,"时候","shíhou","n.","(point in) time; when","🕰️"],[10,"饭店","fàndiàn","n.","restaurant","🍽️"],[10,"知道","zhīdào","v.","to know","🧠"],[10,"正在","zhèngzài","adv.","in the process of (-ing)","🔄"],[10,"找","zhǎo","v.","to look for","🔍"],[10,"开车","kāichē","v.","to drive (a car)","🚗"],[10,"车","chē","n.","vehicle; car","🚙"],[10,"在","zài","adv.","(action in progress)","🔄"],[10,"读","dú","v.","to attend school; study","🎓"],[10,"大学","dàxué","n.","university; college","🏛️"],[10,"大学生","dàxuéshēng","n.","university student","🧑‍🎓"],[10,"学","xué","v.","to study; learn","📓"],[10,"医","yī","n.","medicine (field)","⚕️"],[10,"弟弟","dìdi","n.","younger brother","👦"],[10,"起床","qǐchuáng","v.","to get up (out of bed)","⏰"],[10,"睡觉","shuìjiào","v.","to sleep","😴"],[10,"睡","shuì","v.","to sleep","🛏️"],[10,"那里","nàlǐ","pron.","there","📍"],[10,"哪里","nǎlǐ","pron.","where","🗺️"],[11,"天气","tiānqì","n.","weather","🌦️"],[11,"天","tiān","n.","weather; sky","⛅"],[11,"雨","yǔ","n.","rain","💧"],[11,"下雨","xiàyǔ","","to rain","🌧️"],[11,"这里","zhèlǐ","pron.","here","📍"],[11,"有点儿","yǒudiǎnr","adv.","a bit; rather","🤏"],[11,"冷","lěng","adj.","cold","🥶"],[11,"热","rè","adj.","hot","🥵"],[11,"觉得","juéde","v.","to feel; think","💭"],[11,"了","le","part.","change-of-state particle","🔁"],[11,"下","xià","v.","to fall (rain, snow)","⬇️"],[11,"雪","xuě","n.","snow","❄️"],[11,"来","lái","v.","to come","🫴"],[11,"公司","gōngsī","n.","company","🏢"],[11,"生病","shēngbìng","v.","to fall ill","🤧"],[11,"看病","kànbìng","v.","to see a doctor","🩺"],[11,"病","bìng","v.","to be ill","🤒"],[11,"一点儿","yìdiǎnr","num.-m.","a little; some","🤏"],[11,"药","yào","n.","medicine","💊"],[11,"天","tiān","m.","day","☀️"],[11,"回","huí","v.","to return; go back","↩️"],[11,"再","zài","adv.","then; only then","⏭️"],[11,"喝","hē","v.","to drink","🥤"],[11,"水","shuǐ","n.","water","💧"],[12,"可以","kěyǐ","mod.","can; may (permission)","🆗"],[12,"再","zài","adv.","again; once more","🔁"],[12,"问题","wèntí","n.","question; problem","⁉️"],[12,"卖","mài","v.","to sell","💸"],[12,"打电话","dǎ diànhuà","","to make a phone call","📲"],[12,"一下","yíxià","num.-m.","(do) briefly; once","☝️"],[12,"服务员","fúwùyuán","n.","waiter; attendant","🤵"],[12,"女士","nǚshì","n.","lady; madam","👩‍💼"],[12,"请","qǐng","v.","please; to invite","🙏"],[12,"坐","zuò","v.","to sit","🪑"],[12,"给","gěi","v.","to give","🎁"],[12,"杯","bēi","m.","cup (of); glass (of)","☕"],[12,"要","yào","v.","to want; ask for","🙋"],[12,"早饭","zǎofàn","n.","breakfast","🥞"],[12,"这个","zhège","pron.","this (one)","👇"],[12,"面包","miànbāo","n.","bread","🍞"],[12,"鸡蛋","jīdàn","n.","(hen's) egg","🥚"],[12,"一半","yíbàn","num.","half","🌗"],[12,"茶","chá","n.","tea","🍵"],[13,"上","shàng","v.","to go up; get on","🔼"],[13,"火车","huǒchē","n.","train","🚆"],[13,"中午","zhōngwǔ","n.","noon","🕛"],[13,"开","kāi","v.","to depart (vehicle)","🚉"],[13,"有些","yǒuxiē","pron.","some (part of)","🤏"],[13,"有的","yǒude","pron.","some","🤏"],[13,"写","xiě","v.","to write","✍️"],[13,"都","dōu","adv.","all; both","💯"],[13,"听见","tīngjiàn","v.","to hear","👂"],[13,"不要","búyào","adv.","don't","🙅"],[13,"说话","shuōhuà","v.","to speak; talk","🗣️"],[13,"听","tīng","v.","to listen (to)","🎧"],[13,"哪些","nǎxiē","pron.","which (plural)","🤔"],[13,"字","zì","n.","character; word","🔤"],[13,"汉语","Hànyǔ","","Chinese language","🗨️"],[13,"汉字","Hànzì","","Chinese character","🀄"],[13,"明年","míngnián","n.","next year","🎆"],[13,"上","shàng","v.","to attend (school)","🎒"],[13,"中学","zhōngxué","n.","middle school","🏫"],[13,"小学","xiǎoxué","n.","primary school","🏫"],[13,"中学生","zhōngxuéshēng","n.","middle-school student","🧑‍🎓"],[13,"小学生","xiǎoxuéshēng","n.","primary-school pupil","🧒"],[13,"上学","shàngxué","v.","to go to / start school","🎒"],[13,"他们","tāmen","pron.","they; them","👥"],[13,"她们","tāmen","pron.","they (female)","👭"],[13,"它们","tāmen","pron.","they (things / animals)","🐾"],[13,"晚","wǎn","adj.","late","🐢"],[13,"昨天","zuótiān","n.","yesterday","⏮️"],[13,"问","wèn","v.","to ask","🙋"],[13,"对","duì","prep.","to; towards","➡️"],[13,"说","shuō","v.","to say; speak","💬"],[13,"要","yào","mod.","to want to; will","🎯"],[13,"小朋友","xiǎopéngyǒu","n.","child; kid","🧒"],[14,"爱","ài","v.","to love; be fond of","💕"],[14,"哪个","nǎge","pron.","which (one)","🤔"],[14,"去年","qùnián","n.","last year","⏪"],[14,"男朋友","nánpéngyou","n.","boyfriend","💑"],[14,"几","jǐ","num.","a few; several","🖐️"],[14,"年","nián","n.","year","📅"],[14,"好玩儿","hǎowánr","adj.","fun; interesting","🎉"],[14,"西安","Xī'ān","","Xi'an (city)","🏯"],[14,"北京","Běijīng","","Beijing","🏙️"],[14,"飞机","fēijī","n.","airplane","✈️"],[14,"要","yào","v.","to take (time); need","⌛"],[14,"小时","xiǎoshí","n.","hour","🕓"],[14,"家人","jiārén","n.","family member(s)","👪"],[14,"时间","shíjiān","n.","(duration of) time","⏳"],[14,"机场","jīchǎng","n.","airport","🛫"],[14,"接","jiē","v.","to pick up; meet","🤗"],[14,"住","zhù","v.","to live; stay","🏡"],[14,"早","zǎo","adj.","early","🐓"],[14,"那","nà","conj.","then; in that case","➡️"],[14,"大兴机场","Dàxīng Jīchǎng","","Daxing Airport (Beijing)","🛬"]];
+const CARDS = RAW.map((r,i)=>({id:i,l:r[0],hz:r[1],py:r[2],pos:r[3],en:r[4],em:r[5]}));
+const DAY = 864e5, NEW_PER_SESSION = 15, KEY = 'hsk1-cards-v1';
+
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } },
+  set(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)); }catch(e){} }
+};
+let saved = store.get();
+let srs = saved.srs || {};          // id -> {iv: days, ef, due: ms, reps}
+let settings = Object.assign({lessons:[1], mode:'review', dir:'zh'}, saved.settings || {});
+const persist = () => store.set({srs, settings});
+
+// ---------- scheduling ----------
+function preview(id, g){
+  const s = srs[id] || {iv:0, ef:2.5, reps:0};
+  if (g === 0) return 0;
+  if (!s.reps) return g === 1 ? 1 : g === 2 ? 2 : 4;
+  const iv = Math.max(1, s.iv);
+  if (g === 1) return Math.max(1, Math.round(iv * 1.2));
+  if (g === 2) return Math.max(iv + 1, Math.round(iv * s.ef));
+  return Math.max(iv + 2, Math.round(iv * s.ef * 1.3));
+}
+function grade(id, g){
+  const s = srs[id] || {iv:0, ef:2.5, reps:0};
+  if (g === 0){ s.ef = Math.max(1.3, s.ef - 0.2); s.iv = 0; s.reps = 0; s.due = Date.now(); s.lapse = (s.lapse||0)+1; }
+  else {
+    s.iv = preview(id, g);
+    s.ef = Math.max(1.3, s.ef + (g === 1 ? -0.15 : g === 3 ? 0.15 : 0));
+    s.reps++;
+    s.due = startOfDay(Date.now()) + s.iv * DAY;
+  }
+  srs[id] = s; persist();
+}
+const startOfDay = t => { const d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); };
+const fmtIv = d => d === 0 ? 'again' : d < 30 ? d + 'd' : d < 365 ? Math.round(d/30) + 'mo' : (d/365).toFixed(1) + 'y';
+const isDue = c => srs[c.id] && srs[c.id].reps > 0 && srs[c.id].due <= Date.now();
+const isNew = c => !srs[c.id] || (!srs[c.id].reps && !srs[c.id].lapse);
+
+// ---------- session ----------
+let queue = [], pos = 0, flipped = false, sessionDone = 0, sessionTotal = 0, againCount = 0;
+const inLessons = () => CARDS.filter(c => settings.lessons.includes(c.l));
+
+function buildSession(){
+  const pool = inLessons();
+  flipped = false; pos = 0; sessionDone = 0; againCount = 0;
+  if (settings.mode === 'browse'){ queue = pool.slice(); }
+  else {
+    const due = shuffle(pool.filter(isDue));
+    const lapsed = pool.filter(c => srs[c.id] && !srs[c.id].reps && srs[c.id].lapse);
+    const fresh = pool.filter(isNew).slice(0, NEW_PER_SESSION);
+    queue = [...lapsed, ...due, ...fresh];
+  }
+  sessionTotal = queue.length;
+  render();
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+// ---------- rendering ----------
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const hzSize = h => ({1:128,2:104,3:80,4:64}[h.length] || 52);
+
+function renderStats(){
+  const all = CARDS, sel = inLessons();
+  const learned = all.filter(c => srs[c.id] && srs[c.id].reps > 0).length;
+  const due = sel.filter(isDue).length;
+  const fresh = sel.filter(isNew).length;
+  $('stats').innerHTML = `<span class="due"><b>${due}</b> due</span><span><b>${fresh}</b> new</span><span><b>${learned}</b>/${all.length} learned</span>`;
+}
+function renderLessons(){
+  const el = $('lessons'); el.innerHTML = '';
+  const allOn = settings.lessons.length === 14;
+  const mk = (txt, on, fn, title) => { const b = document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=txt; b.setAttribute('aria-pressed', on); if(title) b.title=title; b.onclick=fn; el.appendChild(b); };
+  for (let i=1;i<=14;i++){
+    const n = CARDS.filter(c=>c.l===i).length;
+    mk(i, settings.lessons.includes(i), () => {
+      const s = new Set(settings.lessons);
+      s.has(i) ? s.delete(i) : s.add(i);
+      if (!s.size) s.add(i);
+      settings.lessons = [...s].sort((a,b)=>a-b); persist(); renderLessons(); buildSession();
+    }, `Lesson ${i} · ${n} words`);
+  }
+  mk('All', allOn, () => { settings.lessons = allOn ? [1] : [...Array(14)].map((_,i)=>i+1); persist(); renderLessons(); buildSession(); });
+}
+function setSeg(id, key){
+  [...$(id).children].forEach(b => {
+    b.setAttribute('aria-pressed', b.dataset.v === settings[key]);
+    b.onclick = () => { settings[key] = b.dataset.v; persist(); setSeg(id, key); key==='mode' ? buildSession() : render(); };
+  });
+}
+
+function faceZh(c){ return `<span class="tag">第${c.l}课</span><div class="emoji">${c.em}</div><div class="hz" style="font-size:${hzSize(c.hz)}px">${esc(c.hz)}</div><span class="hint">Tap or press Space to flip</span>`; }
+function faceEn(c){ return `<span class="tag">Lesson ${c.l}</span><div class="emoji">${c.em}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en big">${esc(c.en)}</div><span class="hint">Say it in Chinese, then flip</span>`; }
+function answerZh(c){ return `<span class="tag">第${c.l}课</span><span class="tag r">${esc(c.hz)}</span><div class="py">${esc(c.py)}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en">${esc(c.en)}</div>${speakBtn()}`; }
+function answerEn(c){ return `<span class="tag">Lesson ${c.l}</span><div class="hz" style="font-size:${Math.round(hzSize(c.hz)*.8)}px">${esc(c.hz)}</div><div class="py">${esc(c.py)}</div><div class="en">${esc(c.en)}</div>${speakBtn()}`; }
+const speakBtn = () => voiceOK ? `<span class="speak" role="button" tabindex="0" data-speak>🔊 Hear it</span>` : '';
+
+function render(){
+  renderStats();
+  const remaining = queue.length - pos;
+  const finished = settings.mode === 'review' ? remaining <= 0 : false;
+  $('studyArea').hidden = finished || !queue.length;
+  $('doneArea').hidden = !(finished || !queue.length);
+  const pct = settings.mode === 'browse' ? (queue.length ? (pos+1)/queue.length : 0) : (sessionTotal ? sessionDone/ (sessionDone + Math.max(remaining,0)) : 1);
+  $('bar').style.width = (pct*100).toFixed(1) + '%';
+
+  if (!queue.length || finished){ renderDone(); $('controls').innerHTML=''; $('metaL').textContent=''; $('metaR').textContent=''; return; }
+
+  const c = queue[pos];
+  $('card').classList.toggle('flip', flipped);
+  const zh = settings.dir === 'zh';
+  $('front').innerHTML = zh ? faceZh(c) : faceEn(c);
+  $('back').innerHTML = zh ? answerZh(c) : answerEn(c);
+
+  if (settings.mode === 'browse'){
+    $('metaL').textContent = `Card ${pos+1} of ${queue.length}`;
+    $('metaR').textContent = srs[c.id]?.reps ? `next review in ${Math.max(0,Math.ceil((srs[c.id].due-Date.now())/DAY))}d` : 'not studied yet';
+    $('controls').innerHTML = `<div class="nav">
+      <button class="btn" type="button" id="prev" ${pos===0?'disabled':''}>← Prev</button>
+      <button class="btn" type="button" id="flipB">${flipped?'Show front':'Flip'}</button>
+      <button class="btn" type="button" id="next" ${pos>=queue.length-1?'disabled':''}>Next →</button></div>`;
+    $('prev').onclick = () => go(-1); $('next').onclick = () => go(1); $('flipB').onclick = flip;
+  } else {
+    const st = isNew(c) ? 'New card' : (srs[c.id]?.lapse && !srs[c.id].reps ? 'Relearning' : 'Review');
+    $('metaL').textContent = `${st}`;
+    $('metaR').textContent = `${remaining} left in session`;
+    if (!flipped){
+      $('controls').innerHTML = `<div class="grade"><button class="btn good wide" type="button" id="show">Show answer <span class="keys">· Space</span></button></div>`;
+      $('show').onclick = flip;
+    } else {
+      const lab = ['Again','Hard','Good','Easy'], cls = ['again','hard','good','easy'];
+      $('controls').innerHTML = `<div class="grade">${lab.map((t,g)=>`<button class="btn ${cls[g]}" type="button" data-g="${g}">${t}<span>${fmtIv(preview(c.id,g))}<span class="keys"> · ${g+1}</span></span></button>`).join('')}</div>`;
+      $('controls').querySelectorAll('[data-g]').forEach(b => b.onclick = () => answer(+b.dataset.g));
+    }
+  }
+}
+function renderDone(){
+  const sel = inLessons();
+  const nextDue = sel.filter(c=>srs[c.id]?.reps).map(c=>srs[c.id].due).sort((a,b)=>a-b)[0];
+  const moreNew = sel.filter(isNew).length;
+  let msg;
+  if (sessionTotal && sessionDone) msg = `${sessionDone} cards reviewed${againCount?`, ${againCount} missed and re-drilled`:''}.`;
+  else msg = 'Nothing is due in the selected lessons right now.';
+  const when = nextDue ? `Next card is due ${nextDue <= Date.now() ? 'now' : new Date(nextDue).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'})}.` : '';
+  $('doneArea').innerHTML = `<div class="done"><div class="big">好！</div><p>${msg} ${when}</p>
+    ${moreNew ? `<button class="btn good wide" type="button" id="more" style="max-width:280px">Learn ${Math.min(NEW_PER_SESSION, moreNew)} more new words</button>` : `<p>Every word in these lessons has been started. Add another lesson above to keep going.</p>`}</div>`;
+  if (moreNew) $('more').onclick = () => { queue = sel.filter(isNew).slice(0, NEW_PER_SESSION); pos=0; sessionTotal=queue.length; sessionDone=0; againCount=0; flipped=false; render(); };
+}
+
+function flip(){ flipped = !flipped; render(); if (flipped && autoSpeak) speak(queue[pos]); }
+function go(d){ pos = Math.min(queue.length-1, Math.max(0, pos+d)); flipped=false; render(); }
+function answer(g){
+  const c = queue[pos];
+  grade(c.id, g);
+  if (g === 0){ againCount++; const at = Math.min(queue.length, pos + 4); queue.splice(at, 0, c); }
+  else sessionDone++;
+  pos++; flipped = false; render();
+}
+
+// ---------- audio ----------
+let zhVoice = null, voiceOK = false, autoSpeak = false;
+function loadVoices(){
+  try{
+    const vs = speechSynthesis.getVoices();
+    zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+    const was = voiceOK; voiceOK = !!zhVoice;
+    if (was !== voiceOK && queue.length) render();
+  }catch(e){}
+}
+function speak(c){
+  if (!voiceOK) return;
+  try{ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(c.hz); u.voice = zhVoice; u.lang = zhVoice.lang; u.rate = .8; speechSynthesis.speak(u); }catch(e){}
+}
+if ('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+
+document.addEventListener('click', e => {
+  const sp = e.target.closest('[data-speak]');
+  if (sp){ e.stopPropagation(); speak(queue[pos]); return; }
+}, true);
+$('card').addEventListener('click', flip);
+
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,textarea')) return;
+  if (!queue.length || $('studyArea').hidden) return;
+  if (e.code === 'Space' || e.key === 'Enter'){ if (e.target.tagName === 'BUTTON') return; e.preventDefault(); flip(); }
+  else if (settings.mode === 'review' && flipped && '1234'.includes(e.key)) answer(+e.key - 1);
+  else if (settings.mode === 'browse' && e.key === 'ArrowRight') go(1);
+  else if (settings.mode === 'browse' && e.key === 'ArrowLeft') go(-1);
+  else if ((e.key === 's' || e.key === 'S') && flipped) speak(queue[pos]);
+});
+
+// swipe on touch: left = next/good, right = prev/again (only after flip in review)
+let tx = null;
+$('card').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+$('card').addEventListener('touchend', e => {
+  if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (Math.abs(dx) < 60) return;
+  if (settings.mode === 'browse') go(dx < 0 ? 1 : -1);
+});
+
+// ---------- reset (inline confirm) ----------
+function bindReset(){
+  $('resetBtn').onclick = () => {
+    $('resetWrap').innerHTML = `<span class="warn">Erase all progress?</span> <button type="button" id="yes">Erase</button> · <button type="button" id="no">Keep</button>`;
+    $('yes').onclick = () => { srs = {}; persist(); restoreReset(); buildSession(); };
+    $('no').onclick = restoreReset;
+  };
+}
+function restoreReset(){ $('resetWrap').innerHTML = `<button type="button" id="resetBtn">Reset progress</button>`; bindReset(); }
+bindReset();
+
+renderLessons(); setSeg('mode','mode'); setSeg('dir','dir'); buildSession();
+</script>
+
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body></html>
