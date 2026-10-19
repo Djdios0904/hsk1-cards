@@ -2,41 +2,39 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>HSK 1 Cards</title>
-<meta name="description" content="Spaced-repetition flashcards for all 318 HSK 1 words, with audio.">
+<title>HSK Cards</title>
+<meta name="description" content="Spaced-repetition flashcards and audio quiz for HSK 1 and HSK 2.">
 <meta name="theme-color" content="#1E7A62">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-512.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
-
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans:ital,wght@0,400;0,600;0,800;1,400&display=swap">
 <style>
-/* Layout: one-column study desk — deck controls up top, a single large card, grading bar under it */
+/* Layout: one-column study desk — category + group pickers, a single large card, controls under it */
 :root{
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
   --bg:#EEF2F0; --surface:#FFFFFF; --ink:#16201C; --muted:#5E6E68; --line:#D3DCD8;
-  --jade:#1E7A62; --jade-soft:#D9EDE6; --cinnabar:#C2412F; --amber:#B7791F; --sky:#2F6FA8;
+  --jade:#1E7A62; --jade-soft:#D9EDE6; --cinnabar:#C2412F; --cin-soft:#F7E1DD; --amber:#B7791F; --sky:#2F6FA8;
   --hz:'Noto Serif SC','Songti SC','SimSun',serif;
   --ui:'Noto Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
   --emoji:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#111816; --surface:#1A2420; --ink:#E7EEEB; --muted:#93A59E; --line:#2C3A35;
-  --jade:#4FBF9C; --jade-soft:#1E3A31; --cinnabar:#E8705D; --amber:#E0A84A; --sky:#6AA8E0; color-scheme:dark}}
+  --jade:#4FBF9C; --jade-soft:#1E3A31; --cinnabar:#E8705D; --cin-soft:#3A221E; --amber:#E0A84A; --sky:#6AA8E0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111816; --surface:#1A2420; --ink:#E7EEEB; --muted:#93A59E; --line:#2C3A35;
-  --jade:#4FBF9C; --jade-soft:#1E3A31; --cinnabar:#E8705D; --amber:#E0A84A; --sky:#6AA8E0; color-scheme:dark}
+  --jade:#4FBF9C; --jade-soft:#1E3A31; --cinnabar:#E8705D; --cin-soft:#3A221E; --amber:#E0A84A; --sky:#6AA8E0; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px}
+[hidden]{display:none!important}
 .wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px;min-height:100%}
 header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
 h1{font-family:var(--hz);font-weight:900;font-size:26px;margin:0;letter-spacing:.02em}
-h1 small{font-family:var(--ui);font-weight:600;font-size:13px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-left:8px}
 .stats{display:flex;gap:14px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .stats b{color:var(--ink);font-weight:800}
 .stats .due b{color:var(--jade)}
@@ -46,26 +44,33 @@ h1 small{font-family:var(--ui);font-weight:600;font-size:13px;color:var(--muted)
 .chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
   border-radius:999px;padding:5px 11px;cursor:pointer;font-variant-numeric:tabular-nums;line-height:1.2}
 .chip[aria-pressed="true"]{background:var(--jade);border-color:var(--jade);color:var(--surface)}
-.chip:focus-visible,.btn:focus-visible,.card:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
-.lessons{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;flex:1}
-.lessons .chip{padding:5px 0;text-align:center}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
-.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink);padding:6px 12px;cursor:pointer}
+button:focus-visible,.card:focus-visible,input:focus-visible,.speak:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.groups{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
+.groups.num{display:grid;grid-template-columns:repeat(8,1fr)}
+.groups.num .chip{padding:5px 0;text-align:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface);max-width:100%}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink);padding:6px 12px;cursor:pointer;white-space:nowrap}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cat{font:inherit;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:9px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cat b{font-size:15px;font-weight:800}
+.cat span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cat[aria-pressed="true"]{border-color:var(--jade);background:var(--jade-soft)}
+.cat[aria-pressed="true"] span{color:var(--ink)}
 .progress{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
 .progress i{display:block;height:100%;background:var(--jade);width:0;transition:width .25s}
-.meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;gap:8px}
 
 .stage{perspective:1400px}
-.card{position:relative;width:100%;aspect-ratio:4/4.4;max-height:58vh;min-height:300px;cursor:pointer;border:0;padding:0;background:none;
-  transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.2,1);display:block;font:inherit;color:inherit;max-width:100%}
+.card{position:relative;width:100%;aspect-ratio:4/4.4;max-height:58vh;min-height:300px;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.2,1);display:block;max-width:100%}
 .card.flip{transform:rotateY(180deg)}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);
   border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:28px 22px;text-align:center;gap:10px;overflow:hidden}
-.face::before{content:"";position:absolute;inset:12px;border:1px solid var(--line);border-radius:11px;pointer-events:none;opacity:.6}
+.face::before,.qcard::before{content:"";position:absolute;inset:12px;border:1px solid var(--line);border-radius:11px;pointer-events:none;opacity:.6}
 .back{transform:rotateY(180deg)}
-.tag{position:absolute;top:22px;left:24px;font-size:12px;font-weight:600;color:var(--jade);letter-spacing:.04em}
+.tag{position:absolute;top:22px;left:24px;font-size:12px;font-weight:600;color:var(--jade);letter-spacing:.04em;max-width:60%;text-align:left}
 .tag.r{left:auto;right:24px;color:var(--muted);font-weight:400}
 .emoji{font-family:var(--emoji);font-size:56px;line-height:1}
 .hz{font-family:var(--hz);font-weight:900;line-height:1.05;letter-spacing:.02em;white-space:nowrap}
@@ -74,54 +79,108 @@ h1 small{font-family:var(--ui);font-weight:600;font-size:13px;color:var(--muted)
 .en{font-size:21px;line-height:1.3;max-width:28ch;text-wrap:balance}
 .en.big{font-size:28px;font-weight:600}
 .hint{font-size:12px;color:var(--muted);position:absolute;bottom:24px}
-.small-hz{font-family:var(--hz);font-weight:600;font-size:40px;line-height:1}
 .speak{font:inherit;font-size:13px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;margin-top:6px}
-.speak[hidden]{display:none}
 
 .grade{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .btn{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 4px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:600;font-size:14px}
+.btn:disabled{opacity:.4;cursor:default}
 .btn span{font-size:11px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
 .btn.again{border-color:color-mix(in srgb,var(--cinnabar) 55%,var(--line));color:var(--cinnabar)}
 .btn.hard{color:var(--amber)}
-.btn.good{background:var(--jade);border-color:var(--jade);color:var(--surface)}
-.btn.good span{color:var(--surface);opacity:.85}
+.btn.good,.btn.primary{background:var(--jade);border-color:var(--jade);color:var(--surface)}
+.btn.good span,.btn.primary span{color:var(--surface);opacity:.85}
 .btn.easy{color:var(--sky)}
 .btn.wide{grid-column:span 4;flex-direction:row;justify-content:center;padding:13px;font-size:15px}
 .nav{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px}
 .done{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
 .done .big{font-family:var(--hz);font-size:64px;font-weight:900;line-height:1}
 .done p{margin:0;color:var(--muted);max-width:36ch;line-height:1.5}
+
+/* quiz */
+.qcard{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:30px 22px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.qcard.ok{border-color:var(--jade)}
+.qcard.bad{border-color:var(--cinnabar)}
+.play{width:112px;height:112px;border-radius:50%;border:0;background:var(--jade);color:var(--surface);cursor:pointer;display:grid;place-items:center;
+  box-shadow:0 0 0 8px var(--jade-soft);transition:transform .12s}
+.play:active{transform:scale(.95)}
+.play svg{width:46px;height:46px}
+.play.playing{animation:pulse 1s ease-out}
+@keyframes pulse{0%{box-shadow:0 0 0 8px var(--jade-soft)}50%{box-shadow:0 0 0 18px var(--jade-soft)}100%{box-shadow:0 0 0 8px var(--jade-soft)}}
+.qprompt{font-size:14px;color:var(--muted)}
+.qprompt b{color:var(--ink)}
+.qform{display:flex;gap:8px;width:100%}
+.qform input{flex:1;min-width:0;font:inherit;font-size:20px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.qform input.hzin{font-family:var(--hz);font-size:24px}
+.qform .btn{flex-direction:row;padding:0 18px}
+.verdict{font-weight:800;font-size:15px;letter-spacing:.02em}
+.verdict.ok{color:var(--jade)}
+.verdict.bad{color:var(--cinnabar)}
+.reveal{display:flex;flex-direction:column;align-items:center;gap:4px}
+.reveal .hz{font-size:56px}
+.reveal .py{font-size:26px}
+.reveal .en{font-size:18px}
+.yours{font-size:13px;color:var(--muted)}
+.yours s{color:var(--cinnabar)}
+.linkbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:4px}
+.missed{width:100%;display:flex;flex-direction:column;gap:0;text-align:left;border-top:1px solid var(--line)}
+.missed div{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:10px 2px;border-bottom:1px solid var(--line);align-items:baseline}
+.missed .h{font-family:var(--hz);font-weight:900;font-size:22px;grid-row:span 2}
+.missed .p{color:var(--jade);font-weight:600}
+.missed .e{font-size:13px;color:var(--muted)}
+.score{font-family:var(--hz);font-weight:900;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.qbtns{display:flex;gap:8px;width:100%;justify-content:center;flex-wrap:wrap}
+.qbtns .btn{flex-direction:row;padding:12px 18px;min-width:140px;justify-content:center}
+
 footer{margin-top:auto;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding-top:6px}
 footer button{font:inherit;font-size:12px;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
 footer .warn{color:var(--cinnabar)}
 .keys{display:none}
 @media (hover:hover) and (pointer:fine){.keys{display:inline}}
-@media (max-width:520px){.lessons{grid-template-columns:repeat(5,1fr)}.panel>.row:first-child{flex-direction:column;align-items:stretch}.lessons{width:100%}.py{font-size:30px}.emoji{font-size:48px}}
-@media (prefers-reduced-motion:reduce){.card{transition:none}}
+@media (max-width:520px){.groups.num{grid-template-columns:repeat(5,1fr)}.panel>.row.grp{flex-direction:column;align-items:stretch}.py{font-size:30px}.emoji{font-size:48px}}
+@media (max-width:380px){.cat{padding:8px}.cat b{font-size:14px}}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.play.playing{animation:none}}
 </style>
 </head><body>
-
-
 <div class="wrap">
   <header>
-    <h1>汉语卡片<small>HSK 1</small></h1>
+    <h1>汉语卡片</h1>
     <div class="stats" id="stats"></div>
   </header>
 
+  <div class="cats" id="cats"></div>
+
   <div class="panel">
-    <div class="row"><span class="lbl">Lessons</span><div class="lessons" id="lessons"></div></div>
+    <div class="row grp"><span class="lbl" id="grpLbl">Lessons</span><div class="groups" id="groups"></div></div>
     <div class="row">
       <span class="lbl">Mode</span>
       <div class="seg" id="mode">
-        <button type="button" data-v="review" aria-pressed="true">Review</button>
-        <button type="button" data-v="browse" aria-pressed="false">Browse</button>
+        <button type="button" data-v="review">Review</button>
+        <button type="button" data-v="browse">Browse</button>
+        <button type="button" data-v="quiz">Audio quiz</button>
       </div>
+    </div>
+    <div class="row" id="cardOpts">
+      <span class="lbl">Show</span>
       <div class="seg" id="dir">
-        <button type="button" data-v="zh" aria-pressed="true">汉字 → EN</button>
-        <button type="button" data-v="en" aria-pressed="false">EN → 汉字</button>
+        <button type="button" data-v="zh">汉字 → EN</button>
+        <button type="button" data-v="en">EN → 汉字</button>
       </div>
-      <button type="button" class="chip" id="autoBtn" aria-pressed="false" title="Play the word automatically when the card flips">🔊 Auto-play</button>
+      <button type="button" class="chip" id="autoBtn" title="Play the word automatically when the card flips">🔊 Auto-play</button>
+    </div>
+    <div class="row" id="quizOpts">
+      <span class="lbl">Answer</span>
+      <div class="seg" id="qType">
+        <button type="button" data-v="en">English</button>
+        <button type="button" data-v="py">Pinyin</button>
+        <button type="button" data-v="hz">汉字</button>
+      </div>
+      <div class="seg" id="qLen">
+        <button type="button" data-v="10">10</button>
+        <button type="button" data-v="20">20</button>
+        <button type="button" data-v="0">All</button>
+      </div>
+      <button type="button" class="chip" id="toneBtn" title="Require correct tones when answering in pinyin">Tones required</button>
     </div>
   </div>
 
@@ -137,6 +196,7 @@ footer .warn{color:var(--cinnabar)}
     </div>
   </div>
   <div id="doneArea" hidden></div>
+  <div id="quizArea" hidden></div>
 
   <div id="controls"></div>
 
@@ -147,8 +207,12 @@ footer .warn{color:var(--cinnabar)}
 </div>
 
 <script>
-const RAW = [[1,"你好","nǐ hǎo","","hello","👋"],[1,"请问","qǐng wèn","v.","excuse me (may I ask)","🙋"],[1,"你","nǐ","pron.","you (singular)","👉"],[1,"好","hǎo","adj.","good; fine","👍"],[1,"叫","jiào","v.","to be called","📛"],[1,"什么","shénme","pron.","what","❓"],[1,"名字","míngzi","n.","name","🏷️"],[1,"我","wǒ","pron.","I; me","🙋‍♂️"],[1,"老师","lǎoshī","n.","teacher","👩‍🏫"],[1,"不","bù","adv.","not; no","🚫"],[1,"是","shì","v.","to be","🟰"],[1,"对不起","duìbuqǐ","v.","sorry","🙇"],[1,"没关系","méi guānxi","","that's all right; never mind","🤝"],[1,"没事","méishì","v.","it doesn't matter","😌"],[1,"谢谢","xièxie","v.","thank you","🙏"],[1,"不客气","bú kèqi","","you're welcome","😊"],[1,"同学","tóngxué","n.","classmate","🧑‍🎓"],[1,"再见","zàijiàn","v.","goodbye","👋"],[2,"人","rén","n.","person; human","🧍"],[2,"的","de","part.","possessive / attributive particle","🔗"],[2,"中国","Zhōngguó","","China","🇨🇳"],[2,"法国","Fǎguó","","France","🇫🇷"],[2,"中文","Zhōngwén","","Chinese language","🀄"],[2,"这","zhè","pron.","this","👇"],[2,"谁","shéi / shuí","pron.","who","🕵️"],[2,"女朋友","nǚpéngyou","n.","girlfriend","👩‍❤️‍👨"],[2,"哪","nǎ","pron.","which","🤔"],[2,"国","guó","n.","country","🗺️"],[2,"她","tā","pron.","she; her","👩"],[2,"泰国","Tàiguó","","Thailand","🇹🇭"],[2,"喂","wèi","int.","hello (on phone); hey","📞"],[2,"姐姐","jiějie","n.","elder sister","👧"],[2,"工作","gōngzuò","n.","job","💼"],[2,"还","hái","adv.","still","⏳"],[2,"忙","máng","adj.","busy","😵‍💫"],[2,"吗","ma","part.","question particle (yes/no)","❔"],[2,"对","duì","adj.","right; correct","✅"],[2,"太","tài","adv.","too; excessively","‼️"],[2,"我们","wǒmen","pron.","we; us","👨‍👩‍👧"],[2,"想","xiǎng","v.","to miss (someone)","💭"],[3,"有","yǒu","v.","to have","🎁"],[3,"没有","méiyǒu","v.","to not have","🈳"],[3,"多少","duōshao","pron.","how many; how much","🔢"],[3,"个","gè","m.","general measure word","1️⃣"],[3,"哥哥","gēge","n.","elder brother","👦"],[3,"呢","ne","part.","question particle (\"and…?\")","💬"],[3,"家","jiā","n.","family","👨‍👩‍👧‍👦"],[3,"几","jǐ","pron.","how many (small number)","🖐️"],[3,"口","kǒu","m.","measure word for family members","👄"],[3,"爸爸","bàba","n.","father","👨"],[3,"妈妈","māma","n.","mother","👩‍🍼"],[3,"妹妹","mèimei","n.","younger sister","👧"],[3,"和","hé","conj.","and","➕"],[3,"儿子","érzi","n.","son","👦"],[3,"孩子","háizi","n.","child; children","🧒"],[3,"女儿","nǚ'ér","n.","daughter","👧"],[3,"岁","suì","m.","year (of age)","🎂"],[3,"他","tā","pron.","he; him","👨"],[3,"今年","jīnnián","n.","this year","📅"],[3,"多","duō","pron.","how (to what extent)","📏"],[3,"大","dà","adj.","old (of age)","🧓"],[4,"今天","jīntiān","n.","today","📆"],[4,"号","hào","m.","date (day of month)","🗓️"],[4,"月","yuè","n.","month","🌙"],[4,"日","rì","m.","day (date)","☀️"],[4,"星期","xīngqī","n.","week","📅"],[4,"星期日","xīngqīrì","n.","Sunday","🌞"],[4,"星期天","xīngqītiān","n.","Sunday (spoken)","🌞"],[4,"休息","xiūxi","v.","to rest","🛋️"],[4,"会","huì","mod.","can; be able to (learned skill)","🎯"],[4,"做饭","zuò fàn","","to cook","🍳"],[4,"做","zuò","v.","to make; produce","🛠️"],[4,"面条儿","miàntiáor","n.","noodles","🍜"],[4,"饺子","jiǎozi","n.","dumplings (jiaozi)","🥟"],[4,"一些","yìxiē","num.-m.","some","🤏"],[4,"菜","cài","n.","dish; course","🍲"],[4,"下班","xiàbān","v.","to get off work","🏃"],[4,"新","xīn","adj.","new","🆕"],[4,"电脑","diànnǎo","n.","computer","💻"],[4,"真","zhēn","adv.","really; truly","💯"],[4,"好看","hǎokàn","adj.","good-looking; nice","😍"],[4,"喜欢","xǐhuan","v.","to like","❤️"],[4,"它","tā","pron.","it","🐾"],[5,"手机","shǒujī","n.","cell phone","📱"],[5,"电话","diànhuà","n.","telephone; phone call","☎️"],[5,"号","hào","n.","number","#️⃣"],[5,"明天","míngtiān","n.","tomorrow","⏭️"],[5,"哪儿","nǎr","pron.","where","📍"],[5,"去","qù","v.","to go (to)","🚶"],[5,"想","xiǎng","mod.","to want; would like","🤩"],[5,"买","mǎi","v.","to buy","🛒"],[5,"东西","dōngxi","n.","thing; stuff","📦"],[5,"超市","chāoshì","n.","supermarket","🏪"],[5,"些","xiē","m.","some; a few","🤏"],[5,"牛奶","niúnǎi","n.","(cow's) milk","🥛"],[5,"吃","chī","v.","to eat","🍽️"],[5,"晚饭","wǎnfàn","n.","dinner; supper","🍛"],[5,"包子","bāozi","n.","steamed stuffed bun","🥟"],[5,"那边","nàbiān","pron.","there; over there","👉"],[5,"好吃","hǎochī","adj.","tasty; delicious","😋"],[5,"非常","fēicháng","adv.","very; extremely","🔥"],[5,"米饭","mǐfàn","n.","(cooked) rice","🍚"],[5,"出租车","chūzūchē","n.","taxi","🚕"],[5,"坐","zuò","v.","to travel by (taxi, bus…)","🚌"],[5,"怎么","zěnme","pron.","how (manner)","🧭"],[5,"天津饭店","Tiānjīn Fàndiàn","","Tianjin Restaurant (name)","🏮"],[6,"点","diǎn","m.","o'clock","🕐"],[6,"分","fēn","m.","minute (clock time)","⏱️"],[6,"现在","xiànzài","n.","now","⌚"],[6,"早上","zǎoshang","n.","(early) morning","🌅"],[6,"上午","shàngwǔ","n.","morning (before noon)","🌤️"],[6,"下午","xiàwǔ","n.","afternoon","🌇"],[6,"课","kè","n.","class; lesson","📚"],[6,"见","jiàn","v.","to meet; see","🤝"],[6,"吧","ba","part.","suggestion particle (\"let's…\")","💡"],[6,"看","kàn","v.","to watch; see; read; look at","👀"],[6,"电影","diànyǐng","n.","movie; film","🎬"],[6,"电影院","diànyǐngyuàn","n.","cinema","🎦"],[6,"事","shì","n.","thing; matter; affair","📝"],[6,"上课","shàngkè","v.","to attend class","🏫"],[6,"下课","xiàkè","v.","to finish class","🔔"],[6,"呢","ne","part.","ongoing-state particle (statement)","💬"],[6,"半","bàn","num.","half","◐"],[6,"家","jiā","n.","home","🏠"],[6,"在","zài","v.","to be at / in / on","📍"],[6,"里","lǐ / li","n.","inside","📥"],[6,"晚上","wǎnshang","n.","evening","🌃"],[6,"医院","yīyuàn","n.","hospital","🏥"],[6,"上班","shàngbān","v.","to go to work","🏢"],[6,"店","diàn","n.","shop; store","🏬"],[6,"菜","cài","n.","vegetable; greens","🥬"],[6,"分钟","fēnzhōng","m.","minute (duration)","⏲️"],[6,"后","hòu","n.","after; later","⏩"],[7,"房间","fángjiān","n.","room","🚪"],[7,"外","wài","n.","outside","🌳"],[7,"只","zhī","m.","measure word for animals","🐦"],[7,"小","xiǎo","adj.","small; little","🐭"],[7,"大","dà","adj.","big; large","🐘"],[7,"猫","māo","n.","cat","🐱"],[7,"没","méi","adv.","not; not yet (past)","⛔"],[7,"看见","kànjiàn","v.","to see; catch sight of","👁️"],[7,"桌子","zhuōzi","n.","table; desk","🪑"],[7,"下","xià","n.","below; under","⬇️"],[7,"漂亮","piàoliang","adj.","pretty; beautiful","🌸"],[7,"在","zài","prep.","at; in","📌"],[7,"学校","xuéxiào","n.","school","🏫"],[7,"书店","shūdiàn","n.","bookstore","📖"],[7,"前","qián","n.","front","⬆️"],[7,"能","néng","mod.","can; be able to (possible)","💪"],[7,"到","dào","v.","to arrive; reach","🏁"],[7,"午饭","wǔfàn","n.","lunch","🥪"],[7,"饭","fàn","n.","meal","🍱"],[7,"病人","bìngrén","n.","patient","🤒"],[7,"多","duō","adj.","many; much","🔝"],[7,"医生","yīshēng","n.","doctor","🧑‍⚕️"],[7,"工作","gōngzuò","v.","to work","👷"],[7,"陆医生","Lù yīshēng","","Dr. Lu (name)","🩺"],[8,"边","biān / bian","suf./n.","side; (locality suffix)","↔️"],[8,"前边","qiánbian","n.","front side","⏫"],[8,"家","jiā","m.","measure word for families / businesses","🏪"],[8,"那个","nàge","pron.","that (one)","👉"],[8,"外边","wàibian","n.","outside","🏞️"],[8,"椅子","yǐzi","n.","chair","🪑"],[8,"上","shàng / shang","n.","on; above","⬆️"],[8,"本","běn","m.","measure word for books","📘"],[8,"书","shū","n.","book","📕"],[8,"那","nà","pron.","that","👉"],[8,"第","dì","pref.","ordinal prefix (1st, 2nd…)","🥇"],[8,"学习","xuéxí","v.","to study; learn","✏️"],[8,"做","zuò","v.","to do; engage in","🧰"],[8,"白天","báitiān","n.","daytime","🌞"],[8,"读书","dúshū","v.","to read (books); study","📖"],[8,"和","hé","prep.","with","👫"],[8,"朋友","péngyou","n.","friend","🧑‍🤝‍🧑"],[8,"唱","chàng","v.","to sing","🎤"],[8,"歌","gē","n.","song","🎵"],[8,"好听","hǎotīng","adj.","pleasant to hear","🎶"],[8,"电视","diànshì","n.","television","📺"],[8,"狗","gǒu","n.","dog","🐶"],[8,"玩","wán","v.","to play; have fun","🎮"],[9,"杯子","bēizi","n.","cup; glass","🥤"],[9,"售货员","shòuhuòyuán","n.","shop assistant","🧑‍💼"],[9,"这边","zhèbiān","pron.","here; this side","👇"],[9,"钱","qián","n.","money","💰"],[9,"块","kuài","m.","kuai (spoken unit of money)","💴"],[9,"这些","zhèxiē","pron.","these","👇"],[9,"那些","nàxiē","pron.","those","👉"],[9,"这儿","zhèr","pron.","here","📍"],[9,"苹果","píngguǒ","n.","apple","🍎"],[9,"水果","shuǐguǒ","n.","fruit","🍇"],[9,"少","shǎo","adj.","few; little","🪫"],[9,"便宜","piányi","adj.","cheap","🏷️"],[9,"斤","jīn","m.","jin (½ kg)","⚖️"],[9,"商店","shāngdiàn","n.","shop; store","🛍️"],[9,"衣服","yīfu","n.","clothes","👕"],[9,"件","jiàn","m.","measure word for clothes, items","🧥"],[9,"元","yuán","m.","yuan (formal unit of money)","💴"],[9,"怎么样","zěnmeyàng","pron.","how (is it)?; how about","🤷"],[9,"贵","guì","adj.","expensive","💎"],[9,"穿","chuān","v.","to wear; put on","👗"],[9,"女","nǚ","adj.","female","♀️"],[9,"男","nán","adj.","male","♂️"],[9,"那儿","nàr","pron.","there","📍"],[10,"时候","shíhou","n.","(point in) time; when","🕰️"],[10,"饭店","fàndiàn","n.","restaurant","🍽️"],[10,"知道","zhīdào","v.","to know","🧠"],[10,"正在","zhèngzài","adv.","in the process of (-ing)","🔄"],[10,"找","zhǎo","v.","to look for","🔍"],[10,"开车","kāichē","v.","to drive (a car)","🚗"],[10,"车","chē","n.","vehicle; car","🚙"],[10,"在","zài","adv.","(action in progress)","🔄"],[10,"读","dú","v.","to attend school; study","🎓"],[10,"大学","dàxué","n.","university; college","🏛️"],[10,"大学生","dàxuéshēng","n.","university student","🧑‍🎓"],[10,"学","xué","v.","to study; learn","📓"],[10,"医","yī","n.","medicine (field)","⚕️"],[10,"弟弟","dìdi","n.","younger brother","👦"],[10,"起床","qǐchuáng","v.","to get up (out of bed)","⏰"],[10,"睡觉","shuìjiào","v.","to sleep","😴"],[10,"睡","shuì","v.","to sleep","🛏️"],[10,"那里","nàlǐ","pron.","there","📍"],[10,"哪里","nǎlǐ","pron.","where","🗺️"],[11,"天气","tiānqì","n.","weather","🌦️"],[11,"天","tiān","n.","weather; sky","⛅"],[11,"雨","yǔ","n.","rain","💧"],[11,"下雨","xiàyǔ","","to rain","🌧️"],[11,"这里","zhèlǐ","pron.","here","📍"],[11,"有点儿","yǒudiǎnr","adv.","a bit; rather","🤏"],[11,"冷","lěng","adj.","cold","🥶"],[11,"热","rè","adj.","hot","🥵"],[11,"觉得","juéde","v.","to feel; think","💭"],[11,"了","le","part.","change-of-state particle","🔁"],[11,"下","xià","v.","to fall (rain, snow)","⬇️"],[11,"雪","xuě","n.","snow","❄️"],[11,"来","lái","v.","to come","🫴"],[11,"公司","gōngsī","n.","company","🏢"],[11,"生病","shēngbìng","v.","to fall ill","🤧"],[11,"看病","kànbìng","v.","to see a doctor","🩺"],[11,"病","bìng","v.","to be ill","🤒"],[11,"一点儿","yìdiǎnr","num.-m.","a little; some","🤏"],[11,"药","yào","n.","medicine","💊"],[11,"天","tiān","m.","day","☀️"],[11,"回","huí","v.","to return; go back","↩️"],[11,"再","zài","adv.","then; only then","⏭️"],[11,"喝","hē","v.","to drink","🥤"],[11,"水","shuǐ","n.","water","💧"],[12,"可以","kěyǐ","mod.","can; may (permission)","🆗"],[12,"再","zài","adv.","again; once more","🔁"],[12,"问题","wèntí","n.","question; problem","⁉️"],[12,"卖","mài","v.","to sell","💸"],[12,"打电话","dǎ diànhuà","","to make a phone call","📲"],[12,"一下","yíxià","num.-m.","(do) briefly; once","☝️"],[12,"服务员","fúwùyuán","n.","waiter; attendant","🤵"],[12,"女士","nǚshì","n.","lady; madam","👩‍💼"],[12,"请","qǐng","v.","please; to invite","🙏"],[12,"坐","zuò","v.","to sit","🪑"],[12,"给","gěi","v.","to give","🎁"],[12,"杯","bēi","m.","cup (of); glass (of)","☕"],[12,"要","yào","v.","to want; ask for","🙋"],[12,"早饭","zǎofàn","n.","breakfast","🥞"],[12,"这个","zhège","pron.","this (one)","👇"],[12,"面包","miànbāo","n.","bread","🍞"],[12,"鸡蛋","jīdàn","n.","(hen's) egg","🥚"],[12,"一半","yíbàn","num.","half","🌗"],[12,"茶","chá","n.","tea","🍵"],[13,"上","shàng","v.","to go up; get on","🔼"],[13,"火车","huǒchē","n.","train","🚆"],[13,"中午","zhōngwǔ","n.","noon","🕛"],[13,"开","kāi","v.","to depart (vehicle)","🚉"],[13,"有些","yǒuxiē","pron.","some (part of)","🤏"],[13,"有的","yǒude","pron.","some","🤏"],[13,"写","xiě","v.","to write","✍️"],[13,"都","dōu","adv.","all; both","💯"],[13,"听见","tīngjiàn","v.","to hear","👂"],[13,"不要","búyào","adv.","don't","🙅"],[13,"说话","shuōhuà","v.","to speak; talk","🗣️"],[13,"听","tīng","v.","to listen (to)","🎧"],[13,"哪些","nǎxiē","pron.","which (plural)","🤔"],[13,"字","zì","n.","character; word","🔤"],[13,"汉语","Hànyǔ","","Chinese language","🗨️"],[13,"汉字","Hànzì","","Chinese character","🀄"],[13,"明年","míngnián","n.","next year","🎆"],[13,"上","shàng","v.","to attend (school)","🎒"],[13,"中学","zhōngxué","n.","middle school","🏫"],[13,"小学","xiǎoxué","n.","primary school","🏫"],[13,"中学生","zhōngxuéshēng","n.","middle-school student","🧑‍🎓"],[13,"小学生","xiǎoxuéshēng","n.","primary-school pupil","🧒"],[13,"上学","shàngxué","v.","to go to / start school","🎒"],[13,"他们","tāmen","pron.","they; them","👥"],[13,"她们","tāmen","pron.","they (female)","👭"],[13,"它们","tāmen","pron.","they (things / animals)","🐾"],[13,"晚","wǎn","adj.","late","🐢"],[13,"昨天","zuótiān","n.","yesterday","⏮️"],[13,"问","wèn","v.","to ask","🙋"],[13,"对","duì","prep.","to; towards","➡️"],[13,"说","shuō","v.","to say; speak","💬"],[13,"要","yào","mod.","to want to; will","🎯"],[13,"小朋友","xiǎopéngyǒu","n.","child; kid","🧒"],[14,"爱","ài","v.","to love; be fond of","💕"],[14,"哪个","nǎge","pron.","which (one)","🤔"],[14,"去年","qùnián","n.","last year","⏪"],[14,"男朋友","nánpéngyou","n.","boyfriend","💑"],[14,"几","jǐ","num.","a few; several","🖐️"],[14,"年","nián","n.","year","📅"],[14,"好玩儿","hǎowánr","adj.","fun; interesting","🎉"],[14,"西安","Xī'ān","","Xi'an (city)","🏯"],[14,"北京","Běijīng","","Beijing","🏙️"],[14,"飞机","fēijī","n.","airplane","✈️"],[14,"要","yào","v.","to take (time); need","⌛"],[14,"小时","xiǎoshí","n.","hour","🕓"],[14,"家人","jiārén","n.","family member(s)","👪"],[14,"时间","shíjiān","n.","(duration of) time","⏳"],[14,"机场","jīchǎng","n.","airport","🛫"],[14,"接","jiē","v.","to pick up; meet","🤗"],[14,"住","zhù","v.","to live; stay","🏡"],[14,"早","zǎo","adj.","early","🐓"],[14,"那","nà","conj.","then; in that case","➡️"],[14,"大兴机场","Dàxīng Jīchǎng","","Daxing Airport (Beijing)","🛬"]];
-const CARDS = RAW.map((r,i)=>({id:i,l:r[0],hz:r[1],py:r[2],pos:r[3],en:r[4],em:r[5]}));
+const CARDS = [{"id":"0","c":"c","g":1,"hz":"你好","py":"nǐ hǎo","pos":"","en":"hello","em":"👋"},{"id":"1","c":"c","g":1,"hz":"请问","py":"qǐng wèn","pos":"v.","en":"excuse me (may I ask)","em":"🙋"},{"id":"2","c":"c","g":1,"hz":"你","py":"nǐ","pos":"pron.","en":"you (singular)","em":"👉"},{"id":"3","c":"c","g":1,"hz":"好","py":"hǎo","pos":"adj.","en":"good; fine","em":"👍"},{"id":"4","c":"c","g":1,"hz":"叫","py":"jiào","pos":"v.","en":"to be called","em":"📛"},{"id":"5","c":"c","g":1,"hz":"什么","py":"shénme","pos":"pron.","en":"what","em":"❓"},{"id":"6","c":"c","g":1,"hz":"名字","py":"míngzi","pos":"n.","en":"name","em":"🏷️"},{"id":"7","c":"c","g":1,"hz":"我","py":"wǒ","pos":"pron.","en":"I; me","em":"🙋‍♂️"},{"id":"8","c":"c","g":1,"hz":"老师","py":"lǎoshī","pos":"n.","en":"teacher","em":"👩‍🏫"},{"id":"9","c":"c","g":1,"hz":"不","py":"bù","pos":"adv.","en":"not; no","em":"🚫"},{"id":"10","c":"c","g":1,"hz":"是","py":"shì","pos":"v.","en":"to be","em":"🟰"},{"id":"11","c":"c","g":1,"hz":"对不起","py":"duìbuqǐ","pos":"v.","en":"sorry","em":"🙇"},{"id":"12","c":"c","g":1,"hz":"没关系","py":"méi guānxi","pos":"","en":"that's all right; never mind","em":"🤝"},{"id":"13","c":"c","g":1,"hz":"没事","py":"méishì","pos":"v.","en":"it doesn't matter","em":"😌"},{"id":"14","c":"c","g":1,"hz":"谢谢","py":"xièxie","pos":"v.","en":"thank you","em":"🙏"},{"id":"15","c":"c","g":1,"hz":"不客气","py":"bú kèqi","pos":"","en":"you're welcome","em":"😊"},{"id":"16","c":"c","g":1,"hz":"同学","py":"tóngxué","pos":"n.","en":"classmate","em":"🧑‍🎓"},{"id":"17","c":"c","g":1,"hz":"再见","py":"zàijiàn","pos":"v.","en":"goodbye","em":"👋"},{"id":"18","c":"c","g":2,"hz":"人","py":"rén","pos":"n.","en":"person; human","em":"🧍"},{"id":"19","c":"c","g":2,"hz":"的","py":"de","pos":"part.","en":"possessive / attributive particle","em":"🔗"},{"id":"20","c":"c","g":2,"hz":"中国","py":"Zhōngguó","pos":"","en":"China","em":"🇨🇳"},{"id":"21","c":"c","g":2,"hz":"法国","py":"Fǎguó","pos":"","en":"France","em":"🇫🇷"},{"id":"22","c":"c","g":2,"hz":"中文","py":"Zhōngwén","pos":"","en":"Chinese language","em":"🀄"},{"id":"23","c":"c","g":2,"hz":"这","py":"zhè","pos":"pron.","en":"this","em":"👇"},{"id":"24","c":"c","g":2,"hz":"谁","py":"shéi / shuí","pos":"pron.","en":"who","em":"🕵️"},{"id":"25","c":"c","g":2,"hz":"女朋友","py":"nǚpéngyou","pos":"n.","en":"girlfriend","em":"👩‍❤️‍👨"},{"id":"26","c":"c","g":2,"hz":"哪","py":"nǎ","pos":"pron.","en":"which","em":"🤔"},{"id":"27","c":"c","g":2,"hz":"国","py":"guó","pos":"n.","en":"country","em":"🗺️"},{"id":"28","c":"c","g":2,"hz":"她","py":"tā","pos":"pron.","en":"she; her","em":"👩"},{"id":"29","c":"c","g":2,"hz":"泰国","py":"Tàiguó","pos":"","en":"Thailand","em":"🇹🇭"},{"id":"30","c":"c","g":2,"hz":"喂","py":"wèi","pos":"int.","en":"hello (on phone); hey","em":"📞"},{"id":"31","c":"c","g":2,"hz":"姐姐","py":"jiějie","pos":"n.","en":"elder sister","em":"👧"},{"id":"32","c":"c","g":2,"hz":"工作","py":"gōngzuò","pos":"n.","en":"job","em":"💼"},{"id":"33","c":"c","g":2,"hz":"还","py":"hái","pos":"adv.","en":"still","em":"⏳"},{"id":"34","c":"c","g":2,"hz":"忙","py":"máng","pos":"adj.","en":"busy","em":"😵‍💫"},{"id":"35","c":"c","g":2,"hz":"吗","py":"ma","pos":"part.","en":"question particle (yes/no)","em":"❔"},{"id":"36","c":"c","g":2,"hz":"对","py":"duì","pos":"adj.","en":"right; correct","em":"✅"},{"id":"37","c":"c","g":2,"hz":"太","py":"tài","pos":"adv.","en":"too; excessively","em":"‼️"},{"id":"38","c":"c","g":2,"hz":"我们","py":"wǒmen","pos":"pron.","en":"we; us","em":"👨‍👩‍👧"},{"id":"39","c":"c","g":2,"hz":"想","py":"xiǎng","pos":"v.","en":"to miss (someone)","em":"💭"},{"id":"40","c":"c","g":3,"hz":"有","py":"yǒu","pos":"v.","en":"to have","em":"🎁"},{"id":"41","c":"c","g":3,"hz":"没有","py":"méiyǒu","pos":"v.","en":"to not have","em":"🈳"},{"id":"42","c":"c","g":3,"hz":"多少","py":"duōshao","pos":"pron.","en":"how many; how much","em":"🔢"},{"id":"43","c":"c","g":3,"hz":"个","py":"gè","pos":"m.","en":"general measure word","em":"1️⃣"},{"id":"44","c":"c","g":3,"hz":"哥哥","py":"gēge","pos":"n.","en":"elder brother","em":"👦"},{"id":"45","c":"c","g":3,"hz":"呢","py":"ne","pos":"part.","en":"question particle (\"and…?\")","em":"💬"},{"id":"46","c":"c","g":3,"hz":"家","py":"jiā","pos":"n.","en":"family","em":"👨‍👩‍👧‍👦"},{"id":"47","c":"c","g":3,"hz":"几","py":"jǐ","pos":"pron.","en":"how many (small number)","em":"🖐️"},{"id":"48","c":"c","g":3,"hz":"口","py":"kǒu","pos":"m.","en":"measure word for family members","em":"👄"},{"id":"49","c":"c","g":3,"hz":"爸爸","py":"bàba","pos":"n.","en":"father","em":"👨"},{"id":"50","c":"c","g":3,"hz":"妈妈","py":"māma","pos":"n.","en":"mother","em":"👩‍🍼"},{"id":"51","c":"c","g":3,"hz":"妹妹","py":"mèimei","pos":"n.","en":"younger sister","em":"👧"},{"id":"52","c":"c","g":3,"hz":"和","py":"hé","pos":"conj.","en":"and","em":"➕"},{"id":"53","c":"c","g":3,"hz":"儿子","py":"érzi","pos":"n.","en":"son","em":"👦"},{"id":"54","c":"c","g":3,"hz":"孩子","py":"háizi","pos":"n.","en":"child; children","em":"🧒"},{"id":"55","c":"c","g":3,"hz":"女儿","py":"nǚ'ér","pos":"n.","en":"daughter","em":"👧"},{"id":"56","c":"c","g":3,"hz":"岁","py":"suì","pos":"m.","en":"year (of age)","em":"🎂"},{"id":"57","c":"c","g":3,"hz":"他","py":"tā","pos":"pron.","en":"he; him","em":"👨"},{"id":"58","c":"c","g":3,"hz":"今年","py":"jīnnián","pos":"n.","en":"this year","em":"📅"},{"id":"59","c":"c","g":3,"hz":"多","py":"duō","pos":"pron.","en":"how (to what extent)","em":"📏"},{"id":"60","c":"c","g":3,"hz":"大","py":"dà","pos":"adj.","en":"old (of age)","em":"🧓"},{"id":"61","c":"c","g":4,"hz":"今天","py":"jīntiān","pos":"n.","en":"today","em":"📆"},{"id":"62","c":"c","g":4,"hz":"号","py":"hào","pos":"m.","en":"date (day of month)","em":"🗓️"},{"id":"63","c":"c","g":4,"hz":"月","py":"yuè","pos":"n.","en":"month","em":"🌙"},{"id":"64","c":"c","g":4,"hz":"日","py":"rì","pos":"m.","en":"day (date)","em":"☀️"},{"id":"65","c":"c","g":4,"hz":"星期","py":"xīngqī","pos":"n.","en":"week","em":"📅"},{"id":"66","c":"c","g":4,"hz":"星期日","py":"xīngqīrì","pos":"n.","en":"Sunday","em":"🌞"},{"id":"67","c":"c","g":4,"hz":"星期天","py":"xīngqītiān","pos":"n.","en":"Sunday (spoken)","em":"🌞"},{"id":"68","c":"c","g":4,"hz":"休息","py":"xiūxi","pos":"v.","en":"to rest","em":"🛋️"},{"id":"69","c":"c","g":4,"hz":"会","py":"huì","pos":"mod.","en":"can; be able to (learned skill)","em":"🎯"},{"id":"70","c":"c","g":4,"hz":"做饭","py":"zuò fàn","pos":"","en":"to cook","em":"🍳"},{"id":"71","c":"c","g":4,"hz":"做","py":"zuò","pos":"v.","en":"to make; produce","em":"🛠️"},{"id":"72","c":"c","g":4,"hz":"面条儿","py":"miàntiáor","pos":"n.","en":"noodles","em":"🍜"},{"id":"73","c":"c","g":4,"hz":"饺子","py":"jiǎozi","pos":"n.","en":"dumplings (jiaozi)","em":"🥟"},{"id":"74","c":"c","g":4,"hz":"一些","py":"yìxiē","pos":"num.-m.","en":"some","em":"🤏"},{"id":"75","c":"c","g":4,"hz":"菜","py":"cài","pos":"n.","en":"dish; course","em":"🍲"},{"id":"76","c":"c","g":4,"hz":"下班","py":"xiàbān","pos":"v.","en":"to get off work","em":"🏃"},{"id":"77","c":"c","g":4,"hz":"新","py":"xīn","pos":"adj.","en":"new","em":"🆕"},{"id":"78","c":"c","g":4,"hz":"电脑","py":"diànnǎo","pos":"n.","en":"computer","em":"💻"},{"id":"79","c":"c","g":4,"hz":"真","py":"zhēn","pos":"adv.","en":"really; truly","em":"💯"},{"id":"80","c":"c","g":4,"hz":"好看","py":"hǎokàn","pos":"adj.","en":"good-looking; nice","em":"😍"},{"id":"81","c":"c","g":4,"hz":"喜欢","py":"xǐhuan","pos":"v.","en":"to like","em":"❤️"},{"id":"82","c":"c","g":4,"hz":"它","py":"tā","pos":"pron.","en":"it","em":"🐾"},{"id":"83","c":"c","g":5,"hz":"手机","py":"shǒujī","pos":"n.","en":"cell phone","em":"📱"},{"id":"84","c":"c","g":5,"hz":"电话","py":"diànhuà","pos":"n.","en":"telephone; phone call","em":"☎️"},{"id":"85","c":"c","g":5,"hz":"号","py":"hào","pos":"n.","en":"number","em":"#️⃣"},{"id":"86","c":"c","g":5,"hz":"明天","py":"míngtiān","pos":"n.","en":"tomorrow","em":"⏭️"},{"id":"87","c":"c","g":5,"hz":"哪儿","py":"nǎr","pos":"pron.","en":"where","em":"📍"},{"id":"88","c":"c","g":5,"hz":"去","py":"qù","pos":"v.","en":"to go (to)","em":"🚶"},{"id":"89","c":"c","g":5,"hz":"想","py":"xiǎng","pos":"mod.","en":"to want; would like","em":"🤩"},{"id":"90","c":"c","g":5,"hz":"买","py":"mǎi","pos":"v.","en":"to buy","em":"🛒"},{"id":"91","c":"c","g":5,"hz":"东西","py":"dōngxi","pos":"n.","en":"thing; stuff","em":"📦"},{"id":"92","c":"c","g":5,"hz":"超市","py":"chāoshì","pos":"n.","en":"supermarket","em":"🏪"},{"id":"93","c":"c","g":5,"hz":"些","py":"xiē","pos":"m.","en":"some; a few","em":"🤏"},{"id":"94","c":"c","g":5,"hz":"牛奶","py":"niúnǎi","pos":"n.","en":"(cow's) milk","em":"🥛"},{"id":"95","c":"c","g":5,"hz":"吃","py":"chī","pos":"v.","en":"to eat","em":"🍽️"},{"id":"96","c":"c","g":5,"hz":"晚饭","py":"wǎnfàn","pos":"n.","en":"dinner; supper","em":"🍛"},{"id":"97","c":"c","g":5,"hz":"包子","py":"bāozi","pos":"n.","en":"steamed stuffed bun","em":"🥟"},{"id":"98","c":"c","g":5,"hz":"那边","py":"nàbiān","pos":"pron.","en":"there; over there","em":"👉"},{"id":"99","c":"c","g":5,"hz":"好吃","py":"hǎochī","pos":"adj.","en":"tasty; delicious","em":"😋"},{"id":"100","c":"c","g":5,"hz":"非常","py":"fēicháng","pos":"adv.","en":"very; extremely","em":"🔥"},{"id":"101","c":"c","g":5,"hz":"米饭","py":"mǐfàn","pos":"n.","en":"(cooked) rice","em":"🍚"},{"id":"102","c":"c","g":5,"hz":"出租车","py":"chūzūchē","pos":"n.","en":"taxi","em":"🚕"},{"id":"103","c":"c","g":5,"hz":"坐","py":"zuò","pos":"v.","en":"to travel by (taxi, bus…)","em":"🚌"},{"id":"104","c":"c","g":5,"hz":"怎么","py":"zěnme","pos":"pron.","en":"how (manner)","em":"🧭"},{"id":"105","c":"c","g":5,"hz":"天津饭店","py":"Tiānjīn Fàndiàn","pos":"","en":"Tianjin Restaurant (name)","em":"🏮"},{"id":"106","c":"c","g":6,"hz":"点","py":"diǎn","pos":"m.","en":"o'clock","em":"🕐"},{"id":"107","c":"c","g":6,"hz":"分","py":"fēn","pos":"m.","en":"minute (clock time)","em":"⏱️"},{"id":"108","c":"c","g":6,"hz":"现在","py":"xiànzài","pos":"n.","en":"now","em":"⌚"},{"id":"109","c":"c","g":6,"hz":"早上","py":"zǎoshang","pos":"n.","en":"(early) morning","em":"🌅"},{"id":"110","c":"c","g":6,"hz":"上午","py":"shàngwǔ","pos":"n.","en":"morning (before noon)","em":"🌤️"},{"id":"111","c":"c","g":6,"hz":"下午","py":"xiàwǔ","pos":"n.","en":"afternoon","em":"🌇"},{"id":"112","c":"c","g":6,"hz":"课","py":"kè","pos":"n.","en":"class; lesson","em":"📚"},{"id":"113","c":"c","g":6,"hz":"见","py":"jiàn","pos":"v.","en":"to meet; see","em":"🤝"},{"id":"114","c":"c","g":6,"hz":"吧","py":"ba","pos":"part.","en":"suggestion particle (\"let's…\")","em":"💡"},{"id":"115","c":"c","g":6,"hz":"看","py":"kàn","pos":"v.","en":"to watch; see; read; look at","em":"👀"},{"id":"116","c":"c","g":6,"hz":"电影","py":"diànyǐng","pos":"n.","en":"movie; film","em":"🎬"},{"id":"117","c":"c","g":6,"hz":"电影院","py":"diànyǐngyuàn","pos":"n.","en":"cinema","em":"🎦"},{"id":"118","c":"c","g":6,"hz":"事","py":"shì","pos":"n.","en":"thing; matter; affair","em":"📝"},{"id":"119","c":"c","g":6,"hz":"上课","py":"shàngkè","pos":"v.","en":"to attend class","em":"🏫"},{"id":"120","c":"c","g":6,"hz":"下课","py":"xiàkè","pos":"v.","en":"to finish class","em":"🔔"},{"id":"121","c":"c","g":6,"hz":"呢","py":"ne","pos":"part.","en":"ongoing-state particle (statement)","em":"💬"},{"id":"122","c":"c","g":6,"hz":"半","py":"bàn","pos":"num.","en":"half","em":"◐"},{"id":"123","c":"c","g":6,"hz":"家","py":"jiā","pos":"n.","en":"home","em":"🏠"},{"id":"124","c":"c","g":6,"hz":"在","py":"zài","pos":"v.","en":"to be at / in / on","em":"📍"},{"id":"125","c":"c","g":6,"hz":"里","py":"lǐ / li","pos":"n.","en":"inside","em":"📥"},{"id":"126","c":"c","g":6,"hz":"晚上","py":"wǎnshang","pos":"n.","en":"evening","em":"🌃"},{"id":"127","c":"c","g":6,"hz":"医院","py":"yīyuàn","pos":"n.","en":"hospital","em":"🏥"},{"id":"128","c":"c","g":6,"hz":"上班","py":"shàngbān","pos":"v.","en":"to go to work","em":"🏢"},{"id":"129","c":"c","g":6,"hz":"店","py":"diàn","pos":"n.","en":"shop; store","em":"🏬"},{"id":"130","c":"c","g":6,"hz":"菜","py":"cài","pos":"n.","en":"vegetable; greens","em":"🥬"},{"id":"131","c":"c","g":6,"hz":"分钟","py":"fēnzhōng","pos":"m.","en":"minute (duration)","em":"⏲️"},{"id":"132","c":"c","g":6,"hz":"后","py":"hòu","pos":"n.","en":"after; later","em":"⏩"},{"id":"133","c":"c","g":7,"hz":"房间","py":"fángjiān","pos":"n.","en":"room","em":"🚪"},{"id":"134","c":"c","g":7,"hz":"外","py":"wài","pos":"n.","en":"outside","em":"🌳"},{"id":"135","c":"c","g":7,"hz":"只","py":"zhī","pos":"m.","en":"measure word for animals","em":"🐦"},{"id":"136","c":"c","g":7,"hz":"小","py":"xiǎo","pos":"adj.","en":"small; little","em":"🐭"},{"id":"137","c":"c","g":7,"hz":"大","py":"dà","pos":"adj.","en":"big; large","em":"🐘"},{"id":"138","c":"c","g":7,"hz":"猫","py":"māo","pos":"n.","en":"cat","em":"🐱"},{"id":"139","c":"c","g":7,"hz":"没","py":"méi","pos":"adv.","en":"not; not yet (past)","em":"⛔"},{"id":"140","c":"c","g":7,"hz":"看见","py":"kànjiàn","pos":"v.","en":"to see; catch sight of","em":"👁️"},{"id":"141","c":"c","g":7,"hz":"桌子","py":"zhuōzi","pos":"n.","en":"table; desk","em":"🪑"},{"id":"142","c":"c","g":7,"hz":"下","py":"xià","pos":"n.","en":"below; under","em":"⬇️"},{"id":"143","c":"c","g":7,"hz":"漂亮","py":"piàoliang","pos":"adj.","en":"pretty; beautiful","em":"🌸"},{"id":"144","c":"c","g":7,"hz":"在","py":"zài","pos":"prep.","en":"at; in","em":"📌"},{"id":"145","c":"c","g":7,"hz":"学校","py":"xuéxiào","pos":"n.","en":"school","em":"🏫"},{"id":"146","c":"c","g":7,"hz":"书店","py":"shūdiàn","pos":"n.","en":"bookstore","em":"📖"},{"id":"147","c":"c","g":7,"hz":"前","py":"qián","pos":"n.","en":"front","em":"⬆️"},{"id":"148","c":"c","g":7,"hz":"能","py":"néng","pos":"mod.","en":"can; be able to (possible)","em":"💪"},{"id":"149","c":"c","g":7,"hz":"到","py":"dào","pos":"v.","en":"to arrive; reach","em":"🏁"},{"id":"150","c":"c","g":7,"hz":"午饭","py":"wǔfàn","pos":"n.","en":"lunch","em":"🥪"},{"id":"151","c":"c","g":7,"hz":"饭","py":"fàn","pos":"n.","en":"meal","em":"🍱"},{"id":"152","c":"c","g":7,"hz":"病人","py":"bìngrén","pos":"n.","en":"patient","em":"🤒"},{"id":"153","c":"c","g":7,"hz":"多","py":"duō","pos":"adj.","en":"many; much","em":"🔝"},{"id":"154","c":"c","g":7,"hz":"医生","py":"yīshēng","pos":"n.","en":"doctor","em":"🧑‍⚕️"},{"id":"155","c":"c","g":7,"hz":"工作","py":"gōngzuò","pos":"v.","en":"to work","em":"👷"},{"id":"156","c":"c","g":7,"hz":"陆医生","py":"Lù yīshēng","pos":"","en":"Dr. Lu (name)","em":"🩺"},{"id":"157","c":"c","g":8,"hz":"边","py":"biān / bian","pos":"suf./n.","en":"side; (locality suffix)","em":"↔️"},{"id":"158","c":"c","g":8,"hz":"前边","py":"qiánbian","pos":"n.","en":"front side","em":"⏫"},{"id":"159","c":"c","g":8,"hz":"家","py":"jiā","pos":"m.","en":"measure word for families / businesses","em":"🏪"},{"id":"160","c":"c","g":8,"hz":"那个","py":"nàge","pos":"pron.","en":"that (one)","em":"👉"},{"id":"161","c":"c","g":8,"hz":"外边","py":"wàibian","pos":"n.","en":"outside","em":"🏞️"},{"id":"162","c":"c","g":8,"hz":"椅子","py":"yǐzi","pos":"n.","en":"chair","em":"🪑"},{"id":"163","c":"c","g":8,"hz":"上","py":"shàng / shang","pos":"n.","en":"on; above","em":"⬆️"},{"id":"164","c":"c","g":8,"hz":"本","py":"běn","pos":"m.","en":"measure word for books","em":"📘"},{"id":"165","c":"c","g":8,"hz":"书","py":"shū","pos":"n.","en":"book","em":"📕"},{"id":"166","c":"c","g":8,"hz":"那","py":"nà","pos":"pron.","en":"that","em":"👉"},{"id":"167","c":"c","g":8,"hz":"第","py":"dì","pos":"pref.","en":"ordinal prefix (1st, 2nd…)","em":"🥇"},{"id":"168","c":"c","g":8,"hz":"学习","py":"xuéxí","pos":"v.","en":"to study; learn","em":"✏️"},{"id":"169","c":"c","g":8,"hz":"做","py":"zuò","pos":"v.","en":"to do; engage in","em":"🧰"},{"id":"170","c":"c","g":8,"hz":"白天","py":"báitiān","pos":"n.","en":"daytime","em":"🌞"},{"id":"171","c":"c","g":8,"hz":"读书","py":"dúshū","pos":"v.","en":"to read (books); study","em":"📖"},{"id":"172","c":"c","g":8,"hz":"和","py":"hé","pos":"prep.","en":"with","em":"👫"},{"id":"173","c":"c","g":8,"hz":"朋友","py":"péngyou","pos":"n.","en":"friend","em":"🧑‍🤝‍🧑"},{"id":"174","c":"c","g":8,"hz":"唱","py":"chàng","pos":"v.","en":"to sing","em":"🎤"},{"id":"175","c":"c","g":8,"hz":"歌","py":"gē","pos":"n.","en":"song","em":"🎵"},{"id":"176","c":"c","g":8,"hz":"好听","py":"hǎotīng","pos":"adj.","en":"pleasant to hear","em":"🎶"},{"id":"177","c":"c","g":8,"hz":"电视","py":"diànshì","pos":"n.","en":"television","em":"📺"},{"id":"178","c":"c","g":8,"hz":"狗","py":"gǒu","pos":"n.","en":"dog","em":"🐶"},{"id":"179","c":"c","g":8,"hz":"玩","py":"wán","pos":"v.","en":"to play; have fun","em":"🎮"},{"id":"180","c":"c","g":9,"hz":"杯子","py":"bēizi","pos":"n.","en":"cup; glass","em":"🥤"},{"id":"181","c":"c","g":9,"hz":"售货员","py":"shòuhuòyuán","pos":"n.","en":"shop assistant","em":"🧑‍💼"},{"id":"182","c":"c","g":9,"hz":"这边","py":"zhèbiān","pos":"pron.","en":"here; this side","em":"👇"},{"id":"183","c":"c","g":9,"hz":"钱","py":"qián","pos":"n.","en":"money","em":"💰"},{"id":"184","c":"c","g":9,"hz":"块","py":"kuài","pos":"m.","en":"kuai (spoken unit of money)","em":"💴"},{"id":"185","c":"c","g":9,"hz":"这些","py":"zhèxiē","pos":"pron.","en":"these","em":"👇"},{"id":"186","c":"c","g":9,"hz":"那些","py":"nàxiē","pos":"pron.","en":"those","em":"👉"},{"id":"187","c":"c","g":9,"hz":"这儿","py":"zhèr","pos":"pron.","en":"here","em":"📍"},{"id":"188","c":"c","g":9,"hz":"苹果","py":"píngguǒ","pos":"n.","en":"apple","em":"🍎"},{"id":"189","c":"c","g":9,"hz":"水果","py":"shuǐguǒ","pos":"n.","en":"fruit","em":"🍇"},{"id":"190","c":"c","g":9,"hz":"少","py":"shǎo","pos":"adj.","en":"few; little","em":"🪫"},{"id":"191","c":"c","g":9,"hz":"便宜","py":"piányi","pos":"adj.","en":"cheap","em":"🏷️"},{"id":"192","c":"c","g":9,"hz":"斤","py":"jīn","pos":"m.","en":"jin (½ kg)","em":"⚖️"},{"id":"193","c":"c","g":9,"hz":"商店","py":"shāngdiàn","pos":"n.","en":"shop; store","em":"🛍️"},{"id":"194","c":"c","g":9,"hz":"衣服","py":"yīfu","pos":"n.","en":"clothes","em":"👕"},{"id":"195","c":"c","g":9,"hz":"件","py":"jiàn","pos":"m.","en":"measure word for clothes, items","em":"🧥"},{"id":"196","c":"c","g":9,"hz":"元","py":"yuán","pos":"m.","en":"yuan (formal unit of money)","em":"💴"},{"id":"197","c":"c","g":9,"hz":"怎么样","py":"zěnmeyàng","pos":"pron.","en":"how (is it)?; how about","em":"🤷"},{"id":"198","c":"c","g":9,"hz":"贵","py":"guì","pos":"adj.","en":"expensive","em":"💎"},{"id":"199","c":"c","g":9,"hz":"穿","py":"chuān","pos":"v.","en":"to wear; put on","em":"👗"},{"id":"200","c":"c","g":9,"hz":"女","py":"nǚ","pos":"adj.","en":"female","em":"♀️"},{"id":"201","c":"c","g":9,"hz":"男","py":"nán","pos":"adj.","en":"male","em":"♂️"},{"id":"202","c":"c","g":9,"hz":"那儿","py":"nàr","pos":"pron.","en":"there","em":"📍"},{"id":"203","c":"c","g":10,"hz":"时候","py":"shíhou","pos":"n.","en":"(point in) time; when","em":"🕰️"},{"id":"204","c":"c","g":10,"hz":"饭店","py":"fàndiàn","pos":"n.","en":"restaurant","em":"🍽️"},{"id":"205","c":"c","g":10,"hz":"知道","py":"zhīdào","pos":"v.","en":"to know","em":"🧠"},{"id":"206","c":"c","g":10,"hz":"正在","py":"zhèngzài","pos":"adv.","en":"in the process of (-ing)","em":"🔄"},{"id":"207","c":"c","g":10,"hz":"找","py":"zhǎo","pos":"v.","en":"to look for","em":"🔍"},{"id":"208","c":"c","g":10,"hz":"开车","py":"kāichē","pos":"v.","en":"to drive (a car)","em":"🚗"},{"id":"209","c":"c","g":10,"hz":"车","py":"chē","pos":"n.","en":"vehicle; car","em":"🚙"},{"id":"210","c":"c","g":10,"hz":"在","py":"zài","pos":"adv.","en":"(action in progress)","em":"🔄"},{"id":"211","c":"c","g":10,"hz":"读","py":"dú","pos":"v.","en":"to attend school; study","em":"🎓"},{"id":"212","c":"c","g":10,"hz":"大学","py":"dàxué","pos":"n.","en":"university; college","em":"🏛️"},{"id":"213","c":"c","g":10,"hz":"大学生","py":"dàxuéshēng","pos":"n.","en":"university student","em":"🧑‍🎓"},{"id":"214","c":"c","g":10,"hz":"学","py":"xué","pos":"v.","en":"to study; learn","em":"📓"},{"id":"215","c":"c","g":10,"hz":"医","py":"yī","pos":"n.","en":"medicine (field)","em":"⚕️"},{"id":"216","c":"c","g":10,"hz":"弟弟","py":"dìdi","pos":"n.","en":"younger brother","em":"👦"},{"id":"217","c":"c","g":10,"hz":"起床","py":"qǐchuáng","pos":"v.","en":"to get up (out of bed)","em":"⏰"},{"id":"218","c":"c","g":10,"hz":"睡觉","py":"shuìjiào","pos":"v.","en":"to sleep","em":"😴"},{"id":"219","c":"c","g":10,"hz":"睡","py":"shuì","pos":"v.","en":"to sleep","em":"🛏️"},{"id":"220","c":"c","g":10,"hz":"那里","py":"nàlǐ","pos":"pron.","en":"there","em":"📍"},{"id":"221","c":"c","g":10,"hz":"哪里","py":"nǎlǐ","pos":"pron.","en":"where","em":"🗺️"},{"id":"222","c":"c","g":11,"hz":"天气","py":"tiānqì","pos":"n.","en":"weather","em":"🌦️"},{"id":"223","c":"c","g":11,"hz":"天","py":"tiān","pos":"n.","en":"weather; sky","em":"⛅"},{"id":"224","c":"c","g":11,"hz":"雨","py":"yǔ","pos":"n.","en":"rain","em":"💧"},{"id":"225","c":"c","g":11,"hz":"下雨","py":"xiàyǔ","pos":"","en":"to rain","em":"🌧️"},{"id":"226","c":"c","g":11,"hz":"这里","py":"zhèlǐ","pos":"pron.","en":"here","em":"📍"},{"id":"227","c":"c","g":11,"hz":"有点儿","py":"yǒudiǎnr","pos":"adv.","en":"a bit; rather","em":"🤏"},{"id":"228","c":"c","g":11,"hz":"冷","py":"lěng","pos":"adj.","en":"cold","em":"🥶"},{"id":"229","c":"c","g":11,"hz":"热","py":"rè","pos":"adj.","en":"hot","em":"🥵"},{"id":"230","c":"c","g":11,"hz":"觉得","py":"juéde","pos":"v.","en":"to feel; think","em":"💭"},{"id":"231","c":"c","g":11,"hz":"了","py":"le","pos":"part.","en":"change-of-state particle","em":"🔁"},{"id":"232","c":"c","g":11,"hz":"下","py":"xià","pos":"v.","en":"to fall (rain, snow)","em":"⬇️"},{"id":"233","c":"c","g":11,"hz":"雪","py":"xuě","pos":"n.","en":"snow","em":"❄️"},{"id":"234","c":"c","g":11,"hz":"来","py":"lái","pos":"v.","en":"to come","em":"🫴"},{"id":"235","c":"c","g":11,"hz":"公司","py":"gōngsī","pos":"n.","en":"company","em":"🏢"},{"id":"236","c":"c","g":11,"hz":"生病","py":"shēngbìng","pos":"v.","en":"to fall ill","em":"🤧"},{"id":"237","c":"c","g":11,"hz":"看病","py":"kànbìng","pos":"v.","en":"to see a doctor","em":"🩺"},{"id":"238","c":"c","g":11,"hz":"病","py":"bìng","pos":"v.","en":"to be ill","em":"🤒"},{"id":"239","c":"c","g":11,"hz":"一点儿","py":"yìdiǎnr","pos":"num.-m.","en":"a little; some","em":"🤏"},{"id":"240","c":"c","g":11,"hz":"药","py":"yào","pos":"n.","en":"medicine","em":"💊"},{"id":"241","c":"c","g":11,"hz":"天","py":"tiān","pos":"m.","en":"day","em":"☀️"},{"id":"242","c":"c","g":11,"hz":"回","py":"huí","pos":"v.","en":"to return; go back","em":"↩️"},{"id":"243","c":"c","g":11,"hz":"再","py":"zài","pos":"adv.","en":"then; only then","em":"⏭️"},{"id":"244","c":"c","g":11,"hz":"喝","py":"hē","pos":"v.","en":"to drink","em":"🥤"},{"id":"245","c":"c","g":11,"hz":"水","py":"shuǐ","pos":"n.","en":"water","em":"💧"},{"id":"246","c":"c","g":12,"hz":"可以","py":"kěyǐ","pos":"mod.","en":"can; may (permission)","em":"🆗"},{"id":"247","c":"c","g":12,"hz":"再","py":"zài","pos":"adv.","en":"again; once more","em":"🔁"},{"id":"248","c":"c","g":12,"hz":"问题","py":"wèntí","pos":"n.","en":"question; problem","em":"⁉️"},{"id":"249","c":"c","g":12,"hz":"卖","py":"mài","pos":"v.","en":"to sell","em":"💸"},{"id":"250","c":"c","g":12,"hz":"打电话","py":"dǎ diànhuà","pos":"","en":"to make a phone call","em":"📲"},{"id":"251","c":"c","g":12,"hz":"一下","py":"yíxià","pos":"num.-m.","en":"(do) briefly; once","em":"☝️"},{"id":"252","c":"c","g":12,"hz":"服务员","py":"fúwùyuán","pos":"n.","en":"waiter; attendant","em":"🤵"},{"id":"253","c":"c","g":12,"hz":"女士","py":"nǚshì","pos":"n.","en":"lady; madam","em":"👩‍💼"},{"id":"254","c":"c","g":12,"hz":"请","py":"qǐng","pos":"v.","en":"please; to invite","em":"🙏"},{"id":"255","c":"c","g":12,"hz":"坐","py":"zuò","pos":"v.","en":"to sit","em":"🪑"},{"id":"256","c":"c","g":12,"hz":"给","py":"gěi","pos":"v.","en":"to give","em":"🎁"},{"id":"257","c":"c","g":12,"hz":"杯","py":"bēi","pos":"m.","en":"cup (of); glass (of)","em":"☕"},{"id":"258","c":"c","g":12,"hz":"要","py":"yào","pos":"v.","en":"to want; ask for","em":"🙋"},{"id":"259","c":"c","g":12,"hz":"早饭","py":"zǎofàn","pos":"n.","en":"breakfast","em":"🥞"},{"id":"260","c":"c","g":12,"hz":"这个","py":"zhège","pos":"pron.","en":"this (one)","em":"👇"},{"id":"261","c":"c","g":12,"hz":"面包","py":"miànbāo","pos":"n.","en":"bread","em":"🍞"},{"id":"262","c":"c","g":12,"hz":"鸡蛋","py":"jīdàn","pos":"n.","en":"(hen's) egg","em":"🥚"},{"id":"263","c":"c","g":12,"hz":"一半","py":"yíbàn","pos":"num.","en":"half","em":"🌗"},{"id":"264","c":"c","g":12,"hz":"茶","py":"chá","pos":"n.","en":"tea","em":"🍵"},{"id":"265","c":"c","g":13,"hz":"上","py":"shàng","pos":"v.","en":"to go up; get on","em":"🔼"},{"id":"266","c":"c","g":13,"hz":"火车","py":"huǒchē","pos":"n.","en":"train","em":"🚆"},{"id":"267","c":"c","g":13,"hz":"中午","py":"zhōngwǔ","pos":"n.","en":"noon","em":"🕛"},{"id":"268","c":"c","g":13,"hz":"开","py":"kāi","pos":"v.","en":"to depart (vehicle)","em":"🚉"},{"id":"269","c":"c","g":13,"hz":"有些","py":"yǒuxiē","pos":"pron.","en":"some (part of)","em":"🤏"},{"id":"270","c":"c","g":13,"hz":"有的","py":"yǒude","pos":"pron.","en":"some","em":"🤏"},{"id":"271","c":"c","g":13,"hz":"写","py":"xiě","pos":"v.","en":"to write","em":"✍️"},{"id":"272","c":"c","g":13,"hz":"都","py":"dōu","pos":"adv.","en":"all; both","em":"💯"},{"id":"273","c":"c","g":13,"hz":"听见","py":"tīngjiàn","pos":"v.","en":"to hear","em":"👂"},{"id":"274","c":"c","g":13,"hz":"不要","py":"búyào","pos":"adv.","en":"don't","em":"🙅"},{"id":"275","c":"c","g":13,"hz":"说话","py":"shuōhuà","pos":"v.","en":"to speak; talk","em":"🗣️"},{"id":"276","c":"c","g":13,"hz":"听","py":"tīng","pos":"v.","en":"to listen (to)","em":"🎧"},{"id":"277","c":"c","g":13,"hz":"哪些","py":"nǎxiē","pos":"pron.","en":"which (plural)","em":"🤔"},{"id":"278","c":"c","g":13,"hz":"字","py":"zì","pos":"n.","en":"character; word","em":"🔤"},{"id":"279","c":"c","g":13,"hz":"汉语","py":"Hànyǔ","pos":"","en":"Chinese language","em":"🗨️"},{"id":"280","c":"c","g":13,"hz":"汉字","py":"Hànzì","pos":"","en":"Chinese character","em":"🀄"},{"id":"281","c":"c","g":13,"hz":"明年","py":"míngnián","pos":"n.","en":"next year","em":"🎆"},{"id":"282","c":"c","g":13,"hz":"上","py":"shàng","pos":"v.","en":"to attend (school)","em":"🎒"},{"id":"283","c":"c","g":13,"hz":"中学","py":"zhōngxué","pos":"n.","en":"middle school","em":"🏫"},{"id":"284","c":"c","g":13,"hz":"小学","py":"xiǎoxué","pos":"n.","en":"primary school","em":"🏫"},{"id":"285","c":"c","g":13,"hz":"中学生","py":"zhōngxuéshēng","pos":"n.","en":"middle-school student","em":"🧑‍🎓"},{"id":"286","c":"c","g":13,"hz":"小学生","py":"xiǎoxuéshēng","pos":"n.","en":"primary-school pupil","em":"🧒"},{"id":"287","c":"c","g":13,"hz":"上学","py":"shàngxué","pos":"v.","en":"to go to / start school","em":"🎒"},{"id":"288","c":"c","g":13,"hz":"他们","py":"tāmen","pos":"pron.","en":"they; them","em":"👥"},{"id":"289","c":"c","g":13,"hz":"她们","py":"tāmen","pos":"pron.","en":"they (female)","em":"👭"},{"id":"290","c":"c","g":13,"hz":"它们","py":"tāmen","pos":"pron.","en":"they (things / animals)","em":"🐾"},{"id":"291","c":"c","g":13,"hz":"晚","py":"wǎn","pos":"adj.","en":"late","em":"🐢"},{"id":"292","c":"c","g":13,"hz":"昨天","py":"zuótiān","pos":"n.","en":"yesterday","em":"⏮️"},{"id":"293","c":"c","g":13,"hz":"问","py":"wèn","pos":"v.","en":"to ask","em":"🙋"},{"id":"294","c":"c","g":13,"hz":"对","py":"duì","pos":"prep.","en":"to; towards","em":"➡️"},{"id":"295","c":"c","g":13,"hz":"说","py":"shuō","pos":"v.","en":"to say; speak","em":"💬"},{"id":"296","c":"c","g":13,"hz":"要","py":"yào","pos":"mod.","en":"to want to; will","em":"🎯"},{"id":"297","c":"c","g":13,"hz":"小朋友","py":"xiǎopéngyǒu","pos":"n.","en":"child; kid","em":"🧒"},{"id":"298","c":"c","g":14,"hz":"爱","py":"ài","pos":"v.","en":"to love; be fond of","em":"💕"},{"id":"299","c":"c","g":14,"hz":"哪个","py":"nǎge","pos":"pron.","en":"which (one)","em":"🤔"},{"id":"300","c":"c","g":14,"hz":"去年","py":"qùnián","pos":"n.","en":"last year","em":"⏪"},{"id":"301","c":"c","g":14,"hz":"男朋友","py":"nánpéngyou","pos":"n.","en":"boyfriend","em":"💑"},{"id":"302","c":"c","g":14,"hz":"几","py":"jǐ","pos":"num.","en":"a few; several","em":"🖐️"},{"id":"303","c":"c","g":14,"hz":"年","py":"nián","pos":"n.","en":"year","em":"📅"},{"id":"304","c":"c","g":14,"hz":"好玩儿","py":"hǎowánr","pos":"adj.","en":"fun; interesting","em":"🎉"},{"id":"305","c":"c","g":14,"hz":"西安","py":"Xī'ān","pos":"","en":"Xi'an (city)","em":"🏯"},{"id":"306","c":"c","g":14,"hz":"北京","py":"Běijīng","pos":"","en":"Beijing","em":"🏙️"},{"id":"307","c":"c","g":14,"hz":"飞机","py":"fēijī","pos":"n.","en":"airplane","em":"✈️"},{"id":"308","c":"c","g":14,"hz":"要","py":"yào","pos":"v.","en":"to take (time); need","em":"⌛"},{"id":"309","c":"c","g":14,"hz":"小时","py":"xiǎoshí","pos":"n.","en":"hour","em":"🕓"},{"id":"310","c":"c","g":14,"hz":"家人","py":"jiārén","pos":"n.","en":"family member(s)","em":"👪"},{"id":"311","c":"c","g":14,"hz":"时间","py":"shíjiān","pos":"n.","en":"(duration of) time","em":"⏳"},{"id":"312","c":"c","g":14,"hz":"机场","py":"jīchǎng","pos":"n.","en":"airport","em":"🛫"},{"id":"313","c":"c","g":14,"hz":"接","py":"jiē","pos":"v.","en":"to pick up; meet","em":"🤗"},{"id":"314","c":"c","g":14,"hz":"住","py":"zhù","pos":"v.","en":"to live; stay","em":"🏡"},{"id":"315","c":"c","g":14,"hz":"早","py":"zǎo","pos":"adj.","en":"early","em":"🐓"},{"id":"316","c":"c","g":14,"hz":"那","py":"nà","pos":"conj.","en":"then; in that case","em":"➡️"},{"id":"317","c":"c","g":14,"hz":"大兴机场","py":"Dàxīng Jīchǎng","pos":"","en":"Daxing Airport (Beijing)","em":"🛬"},{"id":"h1-1","c":"h1","g":1,"hz":"我","py":"wǒ","pos":"pron.","en":"I; me","em":"🙋‍♂️"},{"id":"h1-2","c":"h1","g":1,"hz":"我们","py":"wǒmen","pos":"pron.","en":"we; us","em":"👨‍👩‍👧"},{"id":"h1-3","c":"h1","g":1,"hz":"你","py":"nǐ","pos":"pron.","en":"you","em":"👉"},{"id":"h1-4","c":"h1","g":1,"hz":"他","py":"tā","pos":"pron.","en":"he; him","em":"👨"},{"id":"h1-5","c":"h1","g":1,"hz":"她","py":"tā","pos":"pron.","en":"she; her","em":"👩"},{"id":"h1-6","c":"h1","g":1,"hz":"这","py":"zhè","pos":"pron.","en":"this","em":"👇"},{"id":"h1-7","c":"h1","g":1,"hz":"那","py":"nà","pos":"pron.","en":"that","em":"👉"},{"id":"h1-8","c":"h1","g":1,"hz":"哪","py":"nǎ","pos":"pron.","en":"which","em":"🤔"},{"id":"h1-9","c":"h1","g":1,"hz":"哪儿","py":"nǎr","pos":"pron.","en":"where","em":"📍"},{"id":"h1-10","c":"h1","g":1,"hz":"谁","py":"shéi / shuí","pos":"pron.","en":"who","em":"🕵️"},{"id":"h1-11","c":"h1","g":1,"hz":"什么","py":"shénme","pos":"pron.","en":"what","em":"🤷"},{"id":"h1-12","c":"h1","g":1,"hz":"多少","py":"duōshao","pos":"pron.","en":"how many; how much","em":"🔢"},{"id":"h1-13","c":"h1","g":1,"hz":"几","py":"jǐ","pos":"pron.","en":"how many; a few","em":"🖐️"},{"id":"h1-14","c":"h1","g":1,"hz":"怎么","py":"zěnme","pos":"pron.","en":"how","em":"🧭"},{"id":"h1-15","c":"h1","g":1,"hz":"怎么样","py":"zěnmeyàng","pos":"pron.","en":"how about; how is it","em":"🤔"},{"id":"h1-16","c":"h1","g":2,"hz":"一","py":"yī","pos":"num.","en":"one","em":"1️⃣"},{"id":"h1-17","c":"h1","g":2,"hz":"二","py":"èr","pos":"num.","en":"two","em":"2️⃣"},{"id":"h1-18","c":"h1","g":2,"hz":"三","py":"sān","pos":"num.","en":"three","em":"3️⃣"},{"id":"h1-19","c":"h1","g":2,"hz":"四","py":"sì","pos":"num.","en":"four","em":"4️⃣"},{"id":"h1-20","c":"h1","g":2,"hz":"五","py":"wǔ","pos":"num.","en":"five","em":"5️⃣"},{"id":"h1-21","c":"h1","g":2,"hz":"六","py":"liù","pos":"num.","en":"six","em":"6️⃣"},{"id":"h1-22","c":"h1","g":2,"hz":"七","py":"qī","pos":"num.","en":"seven","em":"7️⃣"},{"id":"h1-23","c":"h1","g":2,"hz":"八","py":"bā","pos":"num.","en":"eight","em":"8️⃣"},{"id":"h1-24","c":"h1","g":2,"hz":"九","py":"jiǔ","pos":"num.","en":"nine","em":"9️⃣"},{"id":"h1-25","c":"h1","g":2,"hz":"十","py":"shí","pos":"num.","en":"ten","em":"🔟"},{"id":"h1-26","c":"h1","g":2,"hz":"个","py":"gè","pos":"m.","en":"general measure word","em":"📦"},{"id":"h1-27","c":"h1","g":2,"hz":"岁","py":"suì","pos":"m.","en":"years old","em":"🎂"},{"id":"h1-28","c":"h1","g":2,"hz":"本","py":"běn","pos":"m.","en":"measure word for books","em":"📘"},{"id":"h1-29","c":"h1","g":2,"hz":"些","py":"xiē","pos":"m.","en":"some; a few","em":"🤏"},{"id":"h1-30","c":"h1","g":2,"hz":"块","py":"kuài","pos":"m.","en":"piece; kuai (money)","em":"💴"},{"id":"h1-31","c":"h1","g":3,"hz":"不","py":"bù","pos":"adv.","en":"not; no","em":"🚫"},{"id":"h1-32","c":"h1","g":3,"hz":"没","py":"méi","pos":"adv.","en":"not; did not","em":"⛔"},{"id":"h1-33","c":"h1","g":3,"hz":"很","py":"hěn","pos":"adv.","en":"very; quite","em":"💯"},{"id":"h1-34","c":"h1","g":3,"hz":"太","py":"tài","pos":"adv.","en":"too; excessively","em":"‼️"},{"id":"h1-35","c":"h1","g":3,"hz":"都","py":"dōu","pos":"adv.","en":"all; both","em":"🙌"},{"id":"h1-36","c":"h1","g":3,"hz":"一点儿","py":"yìdiǎnr","pos":"num.-m.","en":"a little; a bit","em":"🤏"},{"id":"h1-37","c":"h1","g":3,"hz":"和","py":"hé","pos":"conj.","en":"and","em":"➕"},{"id":"h1-38","c":"h1","g":3,"hz":"在","py":"zài","pos":"prep.","en":"in; at","em":"📍"},{"id":"h1-39","c":"h1","g":3,"hz":"的","py":"de","pos":"part.","en":"possessive / attributive particle","em":"🔗"},{"id":"h1-40","c":"h1","g":3,"hz":"了","py":"le","pos":"part.","en":"completed-action / change-of-state particle","em":"✅"},{"id":"h1-41","c":"h1","g":3,"hz":"吗","py":"ma","pos":"part.","en":"yes/no question particle","em":"❔"},{"id":"h1-42","c":"h1","g":3,"hz":"呢","py":"ne","pos":"part.","en":"follow-up question particle (\"and…?\")","em":"💬"},{"id":"h1-43","c":"h1","g":3,"hz":"喂","py":"wèi","pos":"int.","en":"hello (on the phone)","em":"📞"},{"id":"h1-44","c":"h1","g":4,"hz":"家","py":"jiā","pos":"n.","en":"home; family","em":"🏠"},{"id":"h1-45","c":"h1","g":4,"hz":"学校","py":"xuéxiào","pos":"n.","en":"school","em":"🏫"},{"id":"h1-46","c":"h1","g":4,"hz":"饭店","py":"fàndiàn","pos":"n.","en":"restaurant; hotel","em":"🍽️"},{"id":"h1-47","c":"h1","g":4,"hz":"商店","py":"shāngdiàn","pos":"n.","en":"shop; store","em":"🛍️"},{"id":"h1-48","c":"h1","g":4,"hz":"医院","py":"yīyuàn","pos":"n.","en":"hospital","em":"🏥"},{"id":"h1-49","c":"h1","g":4,"hz":"中国","py":"Zhōngguó","pos":"","en":"China","em":"🇨🇳"},{"id":"h1-50","c":"h1","g":4,"hz":"北京","py":"Běijīng","pos":"","en":"Beijing","em":"🏙️"},{"id":"h1-51","c":"h1","g":4,"hz":"上","py":"shàng","pos":"n.","en":"up; on; above","em":"⬆️"},{"id":"h1-52","c":"h1","g":4,"hz":"下","py":"xià","pos":"n.","en":"down; below; under","em":"⬇️"},{"id":"h1-53","c":"h1","g":4,"hz":"前面","py":"qiánmian","pos":"n.","en":"front; ahead","em":"⏫"},{"id":"h1-54","c":"h1","g":4,"hz":"后面","py":"hòumian","pos":"n.","en":"back; behind","em":"⏬"},{"id":"h1-55","c":"h1","g":4,"hz":"里","py":"lǐ","pos":"n.","en":"inside","em":"📥"},{"id":"h1-56","c":"h1","g":4,"hz":"今天","py":"jīntiān","pos":"n.","en":"today","em":"📆"},{"id":"h1-57","c":"h1","g":4,"hz":"明天","py":"míngtiān","pos":"n.","en":"tomorrow","em":"⏭️"},{"id":"h1-58","c":"h1","g":4,"hz":"昨天","py":"zuótiān","pos":"n.","en":"yesterday","em":"⏮️"},{"id":"h1-59","c":"h1","g":4,"hz":"上午","py":"shàngwǔ","pos":"n.","en":"morning (before noon)","em":"🌤️"},{"id":"h1-60","c":"h1","g":4,"hz":"中午","py":"zhōngwǔ","pos":"n.","en":"noon","em":"🕛"},{"id":"h1-61","c":"h1","g":4,"hz":"下午","py":"xiàwǔ","pos":"n.","en":"afternoon","em":"🌇"},{"id":"h1-62","c":"h1","g":4,"hz":"年","py":"nián","pos":"n.","en":"year","em":"📅"},{"id":"h1-63","c":"h1","g":4,"hz":"月","py":"yuè","pos":"n.","en":"month","em":"🌙"},{"id":"h1-64","c":"h1","g":4,"hz":"号","py":"hào","pos":"n.","en":"date (day of month); number","em":"🗓️"},{"id":"h1-65","c":"h1","g":4,"hz":"星期","py":"xīngqī","pos":"n.","en":"week","em":"🗓️"},{"id":"h1-66","c":"h1","g":4,"hz":"点","py":"diǎn","pos":"m.","en":"o'clock","em":"🕐"},{"id":"h1-67","c":"h1","g":4,"hz":"分钟","py":"fēnzhōng","pos":"n.","en":"minute","em":"⏲️"},{"id":"h1-68","c":"h1","g":4,"hz":"现在","py":"xiànzài","pos":"n.","en":"now","em":"⌚"},{"id":"h1-69","c":"h1","g":4,"hz":"时候","py":"shíhou","pos":"n.","en":"time; moment","em":"🕰️"},{"id":"h1-70","c":"h1","g":5,"hz":"爸爸","py":"bàba","pos":"n.","en":"father; dad","em":"👨"},{"id":"h1-71","c":"h1","g":5,"hz":"妈妈","py":"māma","pos":"n.","en":"mother; mum","em":"👩‍🍼"},{"id":"h1-72","c":"h1","g":5,"hz":"儿子","py":"érzi","pos":"n.","en":"son","em":"👦"},{"id":"h1-73","c":"h1","g":5,"hz":"女儿","py":"nǚ'ér","pos":"n.","en":"daughter","em":"👧"},{"id":"h1-74","c":"h1","g":5,"hz":"老师","py":"lǎoshī","pos":"n.","en":"teacher","em":"👩‍🏫"},{"id":"h1-75","c":"h1","g":5,"hz":"学生","py":"xuésheng","pos":"n.","en":"student","em":"🧑‍🎓"},{"id":"h1-76","c":"h1","g":5,"hz":"同学","py":"tóngxué","pos":"n.","en":"classmate","em":"🧑‍🤝‍🧑"},{"id":"h1-77","c":"h1","g":5,"hz":"朋友","py":"péngyou","pos":"n.","en":"friend","em":"🤝"},{"id":"h1-78","c":"h1","g":5,"hz":"医生","py":"yīshēng","pos":"n.","en":"doctor","em":"🧑‍⚕️"},{"id":"h1-79","c":"h1","g":5,"hz":"先生","py":"xiānsheng","pos":"n.","en":"Mr.; sir; husband","em":"🎩"},{"id":"h1-80","c":"h1","g":5,"hz":"小姐","py":"xiǎojiě","pos":"n.","en":"Miss; young lady","em":"👱‍♀️"},{"id":"h1-81","c":"h1","g":6,"hz":"衣服","py":"yīfu","pos":"n.","en":"clothes","em":"👕"},{"id":"h1-82","c":"h1","g":6,"hz":"水","py":"shuǐ","pos":"n.","en":"water","em":"💧"},{"id":"h1-83","c":"h1","g":6,"hz":"菜","py":"cài","pos":"n.","en":"dish; vegetable","em":"🥬"},{"id":"h1-84","c":"h1","g":6,"hz":"米饭","py":"mǐfàn","pos":"n.","en":"(cooked) rice","em":"🍚"},{"id":"h1-85","c":"h1","g":6,"hz":"水果","py":"shuǐguǒ","pos":"n.","en":"fruit","em":"🍇"},{"id":"h1-86","c":"h1","g":6,"hz":"苹果","py":"píngguǒ","pos":"n.","en":"apple","em":"🍎"},{"id":"h1-87","c":"h1","g":6,"hz":"茶","py":"chá","pos":"n.","en":"tea","em":"🍵"},{"id":"h1-88","c":"h1","g":6,"hz":"杯子","py":"bēizi","pos":"n.","en":"cup; glass","em":"🥤"},{"id":"h1-89","c":"h1","g":6,"hz":"钱","py":"qián","pos":"n.","en":"money","em":"💰"},{"id":"h1-90","c":"h1","g":6,"hz":"飞机","py":"fēijī","pos":"n.","en":"airplane","em":"✈️"},{"id":"h1-91","c":"h1","g":6,"hz":"出租车","py":"chūzūchē","pos":"n.","en":"taxi","em":"🚕"},{"id":"h1-92","c":"h1","g":6,"hz":"电视","py":"diànshì","pos":"n.","en":"television; TV","em":"📺"},{"id":"h1-93","c":"h1","g":6,"hz":"电脑","py":"diànnǎo","pos":"n.","en":"computer","em":"💻"},{"id":"h1-94","c":"h1","g":6,"hz":"电影","py":"diànyǐng","pos":"n.","en":"movie; film","em":"🎬"},{"id":"h1-95","c":"h1","g":6,"hz":"天气","py":"tiānqì","pos":"n.","en":"weather","em":"🌦️"},{"id":"h1-96","c":"h1","g":6,"hz":"猫","py":"māo","pos":"n.","en":"cat","em":"🐱"},{"id":"h1-97","c":"h1","g":6,"hz":"狗","py":"gǒu","pos":"n.","en":"dog","em":"🐶"},{"id":"h1-98","c":"h1","g":6,"hz":"东西","py":"dōngxi","pos":"n.","en":"thing; stuff","em":"📦"},{"id":"h1-99","c":"h1","g":6,"hz":"人","py":"rén","pos":"n.","en":"person; people","em":"🧍"},{"id":"h1-100","c":"h1","g":6,"hz":"名字","py":"míngzi","pos":"n.","en":"name","em":"🏷️"},{"id":"h1-101","c":"h1","g":6,"hz":"书","py":"shū","pos":"n.","en":"book","em":"📕"},{"id":"h1-102","c":"h1","g":6,"hz":"汉语","py":"Hànyǔ","pos":"n.","en":"Chinese (language)","em":"🗨️"},{"id":"h1-103","c":"h1","g":6,"hz":"字","py":"zì","pos":"n.","en":"character; word","em":"🔤"},{"id":"h1-104","c":"h1","g":6,"hz":"桌子","py":"zhuōzi","pos":"n.","en":"table; desk","em":"🪵"},{"id":"h1-105","c":"h1","g":6,"hz":"椅子","py":"yǐzi","pos":"n.","en":"chair","em":"🪑"},{"id":"h1-106","c":"h1","g":7,"hz":"谢谢","py":"xièxie","pos":"v.","en":"thank you; thanks","em":"🙏"},{"id":"h1-107","c":"h1","g":7,"hz":"不客气","py":"bú kèqi","pos":"","en":"you're welcome","em":"😊"},{"id":"h1-108","c":"h1","g":7,"hz":"再见","py":"zàijiàn","pos":"v.","en":"goodbye; bye","em":"👋"},{"id":"h1-109","c":"h1","g":7,"hz":"请","py":"qǐng","pos":"v.","en":"please; to invite","em":"💁"},{"id":"h1-110","c":"h1","g":7,"hz":"对不起","py":"duìbuqǐ","pos":"v.","en":"sorry","em":"🙇"},{"id":"h1-111","c":"h1","g":7,"hz":"没关系","py":"méi guānxi","pos":"","en":"it doesn't matter; never mind","em":"😌"},{"id":"h1-112","c":"h1","g":7,"hz":"是","py":"shì","pos":"v.","en":"to be","em":"🟰"},{"id":"h1-113","c":"h1","g":7,"hz":"有","py":"yǒu","pos":"v.","en":"to have; there is","em":"🎁"},{"id":"h1-114","c":"h1","g":7,"hz":"看","py":"kàn","pos":"v.","en":"to look; to watch; to read","em":"👀"},{"id":"h1-115","c":"h1","g":7,"hz":"听","py":"tīng","pos":"v.","en":"to listen; to hear","em":"🎧"},{"id":"h1-116","c":"h1","g":7,"hz":"说","py":"shuō","pos":"v.","en":"to speak; to say","em":"🗣️"},{"id":"h1-117","c":"h1","g":7,"hz":"读","py":"dú","pos":"v.","en":"to read (aloud)","em":"📖"},{"id":"h1-118","c":"h1","g":7,"hz":"写","py":"xiě","pos":"v.","en":"to write","em":"✍️"},{"id":"h1-119","c":"h1","g":7,"hz":"看见","py":"kànjiàn","pos":"v.","en":"to see","em":"👁️"},{"id":"h1-120","c":"h1","g":7,"hz":"叫","py":"jiào","pos":"v.","en":"to call; to be called","em":"📛"},{"id":"h1-121","c":"h1","g":7,"hz":"来","py":"lái","pos":"v.","en":"to come","em":"🫴"},{"id":"h1-122","c":"h1","g":7,"hz":"回","py":"huí","pos":"v.","en":"to return; to go back","em":"↩️"},{"id":"h1-123","c":"h1","g":7,"hz":"去","py":"qù","pos":"v.","en":"to go","em":"🚶"},{"id":"h1-124","c":"h1","g":8,"hz":"吃","py":"chī","pos":"v.","en":"to eat","em":"🍽️"},{"id":"h1-125","c":"h1","g":8,"hz":"喝","py":"hē","pos":"v.","en":"to drink","em":"🥤"},{"id":"h1-126","c":"h1","g":8,"hz":"睡觉","py":"shuìjiào","pos":"v.","en":"to sleep","em":"😴"},{"id":"h1-127","c":"h1","g":8,"hz":"打电话","py":"dǎ diànhuà","pos":"","en":"to make a phone call; to call","em":"📲"},{"id":"h1-128","c":"h1","g":8,"hz":"做","py":"zuò","pos":"v.","en":"to do; to make","em":"🛠️"},{"id":"h1-129","c":"h1","g":8,"hz":"买","py":"mǎi","pos":"v.","en":"to buy","em":"🛒"},{"id":"h1-130","c":"h1","g":8,"hz":"开","py":"kāi","pos":"v.","en":"to open; to drive","em":"🔓"},{"id":"h1-131","c":"h1","g":8,"hz":"坐","py":"zuò","pos":"v.","en":"to sit; to travel by","em":"💺"},{"id":"h1-132","c":"h1","g":8,"hz":"住","py":"zhù","pos":"v.","en":"to live; to stay","em":"🏡"},{"id":"h1-133","c":"h1","g":8,"hz":"学习","py":"xuéxí","pos":"v.","en":"to study; to learn","em":"✏️"},{"id":"h1-134","c":"h1","g":8,"hz":"工作","py":"gōngzuò","pos":"v.","en":"to work; work; job","em":"💼"},{"id":"h1-135","c":"h1","g":8,"hz":"下雨","py":"xiàyǔ","pos":"v.","en":"to rain","em":"🌧️"},{"id":"h1-136","c":"h1","g":8,"hz":"爱","py":"ài","pos":"v.","en":"to love","em":"💕"},{"id":"h1-137","c":"h1","g":8,"hz":"喜欢","py":"xǐhuan","pos":"v.","en":"to like","em":"❤️"},{"id":"h1-138","c":"h1","g":8,"hz":"想","py":"xiǎng","pos":"v.","en":"to want; to think; to miss","em":"💭"},{"id":"h1-139","c":"h1","g":8,"hz":"认识","py":"rènshi","pos":"v.","en":"to know (a person); to meet","em":"👥"},{"id":"h1-140","c":"h1","g":8,"hz":"会","py":"huì","pos":"mod.","en":"can; to know how to","em":"🎯"},{"id":"h1-141","c":"h1","g":8,"hz":"能","py":"néng","pos":"mod.","en":"can; to be able to","em":"💪"},{"id":"h1-142","c":"h1","g":9,"hz":"好","py":"hǎo","pos":"adj.","en":"good; well","em":"👍"},{"id":"h1-143","c":"h1","g":9,"hz":"大","py":"dà","pos":"adj.","en":"big; large","em":"🐘"},{"id":"h1-144","c":"h1","g":9,"hz":"小","py":"xiǎo","pos":"adj.","en":"small; little","em":"🐭"},{"id":"h1-145","c":"h1","g":9,"hz":"多","py":"duō","pos":"adj.","en":"many; much","em":"🔝"},{"id":"h1-146","c":"h1","g":9,"hz":"少","py":"shǎo","pos":"adj.","en":"few; little","em":"🪫"},{"id":"h1-147","c":"h1","g":9,"hz":"冷","py":"lěng","pos":"adj.","en":"cold","em":"🥶"},{"id":"h1-148","c":"h1","g":9,"hz":"热","py":"rè","pos":"adj.","en":"hot","em":"🥵"},{"id":"h1-149","c":"h1","g":9,"hz":"高兴","py":"gāoxìng","pos":"adj.","en":"happy; glad","em":"😄"},{"id":"h1-150","c":"h1","g":9,"hz":"漂亮","py":"piàoliang","pos":"adj.","en":"pretty; beautiful","em":"🌸"},{"id":"h2-1","c":"h2","g":1,"hz":"您","py":"nín","pos":"pron.","en":"you (polite)","em":"🎩"},{"id":"h2-2","c":"h2","g":1,"hz":"它","py":"tā","pos":"pron.","en":"it","em":"🐾"},{"id":"h2-3","c":"h2","g":1,"hz":"大家","py":"dàjiā","pos":"pron.","en":"everyone; everybody","em":"👥"},{"id":"h2-4","c":"h2","g":1,"hz":"每","py":"měi","pos":"pron.","en":"every; each","em":"🔁"},{"id":"h2-5","c":"h2","g":1,"hz":"为什么","py":"wèishénme","pos":"pron.","en":"why","em":"❓"},{"id":"h2-6","c":"h2","g":1,"hz":"零","py":"líng","pos":"num.","en":"zero","em":"0️⃣"},{"id":"h2-7","c":"h2","g":1,"hz":"两","py":"liǎng","pos":"num.","en":"two (of something)","em":"✌️"},{"id":"h2-8","c":"h2","g":1,"hz":"百","py":"bǎi","pos":"num.","en":"hundred","em":"💯"},{"id":"h2-9","c":"h2","g":1,"hz":"千","py":"qiān","pos":"num.","en":"thousand","em":"🔢"},{"id":"h2-10","c":"h2","g":1,"hz":"第一","py":"dì-yī","pos":"num.","en":"first","em":"🥇"},{"id":"h2-11","c":"h2","g":1,"hz":"次","py":"cì","pos":"m.","en":"time (occurrence)","em":"🔂"},{"id":"h2-12","c":"h2","g":1,"hz":"件","py":"jiàn","pos":"m.","en":"measure word for clothes and matters","em":"🧥"},{"id":"h2-13","c":"h2","g":2,"hz":"别","py":"bié","pos":"adv.","en":"don't","em":"🙅"},{"id":"h2-14","c":"h2","g":2,"hz":"非常","py":"fēicháng","pos":"adv.","en":"very; extremely","em":"🔥"},{"id":"h2-15","c":"h2","g":2,"hz":"也","py":"yě","pos":"adv.","en":"also; too","em":"➕"},{"id":"h2-16","c":"h2","g":2,"hz":"还","py":"hái","pos":"adv.","en":"still; also","em":"⏳"},{"id":"h2-17","c":"h2","g":2,"hz":"最","py":"zuì","pos":"adv.","en":"most; the most","em":"🏆"},{"id":"h2-18","c":"h2","g":2,"hz":"真","py":"zhēn","pos":"adv.","en":"really; truly","em":"✨"},{"id":"h2-19","c":"h2","g":2,"hz":"正在","py":"zhèngzài","pos":"adv.","en":"in the middle of (doing)","em":"🔄"},{"id":"h2-20","c":"h2","g":2,"hz":"已经","py":"yǐjīng","pos":"adv.","en":"already","em":"✔️"},{"id":"h2-21","c":"h2","g":2,"hz":"一起","py":"yìqǐ","pos":"adv.","en":"together","em":"👫"},{"id":"h2-22","c":"h2","g":2,"hz":"再","py":"zài","pos":"adv.","en":"again","em":"🔁"},{"id":"h2-23","c":"h2","g":2,"hz":"就","py":"jiù","pos":"adv.","en":"right away; exactly; then","em":"⚡"},{"id":"h2-24","c":"h2","g":2,"hz":"因为…所以…","py":"yīnwèi… suǒyǐ…","pos":"conj.","en":"because… so…","em":"🔀"},{"id":"h2-25","c":"h2","g":2,"hz":"虽然…但是…","py":"suīrán… dànshì…","pos":"conj.","en":"although… but…","em":"⚖️"},{"id":"h2-26","c":"h2","g":3,"hz":"从","py":"cóng","pos":"prep.","en":"from","em":"🚩"},{"id":"h2-27","c":"h2","g":3,"hz":"比","py":"bǐ","pos":"prep.","en":"than (comparison)","em":"📊"},{"id":"h2-28","c":"h2","g":3,"hz":"往","py":"wǎng","pos":"prep.","en":"towards; to","em":"➡️"},{"id":"h2-29","c":"h2","g":3,"hz":"离","py":"lí","pos":"prep.","en":"away from (distance)","em":"📏"},{"id":"h2-30","c":"h2","g":3,"hz":"得","py":"de","pos":"part.","en":"complement particle (verb + 得)","em":"🎯"},{"id":"h2-31","c":"h2","g":3,"hz":"着","py":"zhe","pos":"part.","en":"continuous-state particle","em":"⏸️"},{"id":"h2-32","c":"h2","g":3,"hz":"过","py":"guo","pos":"part.","en":"experience particle (have done)","em":"🧳"},{"id":"h2-33","c":"h2","g":3,"hz":"吧","py":"ba","pos":"part.","en":"suggestion particle (\"let's…\")","em":"💡"},{"id":"h2-34","c":"h2","g":4,"hz":"机场","py":"jīchǎng","pos":"n.","en":"airport","em":"🛫"},{"id":"h2-35","c":"h2","g":4,"hz":"教室","py":"jiàoshì","pos":"n.","en":"classroom","em":"🏫"},{"id":"h2-36","c":"h2","g":4,"hz":"房间","py":"fángjiān","pos":"n.","en":"room","em":"🚪"},{"id":"h2-37","c":"h2","g":4,"hz":"路","py":"lù","pos":"n.","en":"road; street","em":"🛣️"},{"id":"h2-38","c":"h2","g":4,"hz":"左边","py":"zuǒbian","pos":"n.","en":"left; left side","em":"⬅️"},{"id":"h2-39","c":"h2","g":4,"hz":"右边","py":"yòubian","pos":"n.","en":"right; right side","em":"➡️"},{"id":"h2-40","c":"h2","g":4,"hz":"外","py":"wài","pos":"n.","en":"outside","em":"🌳"},{"id":"h2-41","c":"h2","g":4,"hz":"旁边","py":"pángbiān","pos":"n.","en":"beside; next to","em":"↔️"},{"id":"h2-42","c":"h2","g":4,"hz":"一下","py":"yíxià","pos":"num.-m.","en":"(do) briefly; a bit","em":"☝️"},{"id":"h2-43","c":"h2","g":4,"hz":"早上","py":"zǎoshang","pos":"n.","en":"(early) morning","em":"🌅"},{"id":"h2-44","c":"h2","g":4,"hz":"晚上","py":"wǎnshang","pos":"n.","en":"evening; night","em":"🌃"},{"id":"h2-45","c":"h2","g":4,"hz":"小时","py":"xiǎoshí","pos":"n.","en":"hour","em":"🕓"},{"id":"h2-46","c":"h2","g":4,"hz":"时间","py":"shíjiān","pos":"n.","en":"time","em":"⏳"},{"id":"h2-47","c":"h2","g":4,"hz":"去年","py":"qùnián","pos":"n.","en":"last year","em":"⏪"},{"id":"h2-48","c":"h2","g":4,"hz":"日","py":"rì","pos":"n.","en":"day; date","em":"☀️"},{"id":"h2-49","c":"h2","g":4,"hz":"生日","py":"shēngrì","pos":"n.","en":"birthday","em":"🎂"},{"id":"h2-50","c":"h2","g":5,"hz":"哥哥","py":"gēge","pos":"n.","en":"older brother","em":"👦"},{"id":"h2-51","c":"h2","g":5,"hz":"姐姐","py":"jiějie","pos":"n.","en":"older sister","em":"👧"},{"id":"h2-52","c":"h2","g":5,"hz":"弟弟","py":"dìdi","pos":"n.","en":"younger brother","em":"👶"},{"id":"h2-53","c":"h2","g":5,"hz":"妹妹","py":"mèimei","pos":"n.","en":"younger sister","em":"🎀"},{"id":"h2-54","c":"h2","g":5,"hz":"丈夫","py":"zhàngfu","pos":"n.","en":"husband","em":"🤵"},{"id":"h2-55","c":"h2","g":5,"hz":"妻子","py":"qīzi","pos":"n.","en":"wife","em":"👰"},{"id":"h2-56","c":"h2","g":5,"hz":"孩子","py":"háizi","pos":"n.","en":"child","em":"🧒"},{"id":"h2-57","c":"h2","g":5,"hz":"男人","py":"nánrén","pos":"n.","en":"man","em":"👨"},{"id":"h2-58","c":"h2","g":5,"hz":"女人","py":"nǚrén","pos":"n.","en":"woman","em":"👩"},{"id":"h2-59","c":"h2","g":5,"hz":"服务员","py":"fúwùyuán","pos":"n.","en":"waiter; attendant","em":"🛎️"},{"id":"h2-60","c":"h2","g":6,"hz":"鱼","py":"yú","pos":"n.","en":"fish","em":"🐟"},{"id":"h2-61","c":"h2","g":6,"hz":"羊肉","py":"yángròu","pos":"n.","en":"mutton; lamb","em":"🐑"},{"id":"h2-62","c":"h2","g":6,"hz":"牛奶","py":"niúnǎi","pos":"n.","en":"milk","em":"🥛"},{"id":"h2-63","c":"h2","g":6,"hz":"鸡蛋","py":"jīdàn","pos":"n.","en":"egg","em":"🥚"},{"id":"h2-64","c":"h2","g":6,"hz":"西瓜","py":"xīguā","pos":"n.","en":"watermelon","em":"🍉"},{"id":"h2-65","c":"h2","g":6,"hz":"咖啡","py":"kāfēi","pos":"n.","en":"coffee","em":"☕"},{"id":"h2-66","c":"h2","g":6,"hz":"雪","py":"xuě","pos":"n.","en":"snow","em":"❄️"},{"id":"h2-67","c":"h2","g":6,"hz":"药","py":"yào","pos":"n.","en":"medicine","em":"💊"},{"id":"h2-68","c":"h2","g":6,"hz":"手机","py":"shǒujī","pos":"n.","en":"mobile phone; cellphone","em":"📱"},{"id":"h2-69","c":"h2","g":6,"hz":"手表","py":"shǒubiǎo","pos":"n.","en":"wristwatch; watch","em":"⌚"},{"id":"h2-70","c":"h2","g":6,"hz":"眼睛","py":"yǎnjing","pos":"n.","en":"eye","em":"👁️"},{"id":"h2-71","c":"h2","g":6,"hz":"身体","py":"shēntǐ","pos":"n.","en":"body; health","em":"🧍"},{"id":"h2-72","c":"h2","g":6,"hz":"公共汽车","py":"gōnggòng qìchē","pos":"n.","en":"bus","em":"🚌"},{"id":"h2-73","c":"h2","g":6,"hz":"报纸","py":"bàozhǐ","pos":"n.","en":"newspaper","em":"📰"},{"id":"h2-74","c":"h2","g":6,"hz":"门","py":"mén","pos":"n.","en":"door","em":"🚪"},{"id":"h2-75","c":"h2","g":6,"hz":"题","py":"tí","pos":"n.","en":"question (in an exam); topic","em":"📝"},{"id":"h2-76","c":"h2","g":6,"hz":"课","py":"kè","pos":"n.","en":"class; lesson","em":"📚"},{"id":"h2-77","c":"h2","g":6,"hz":"姓","py":"xìng","pos":"n.","en":"surname; family name","em":"🏷️"},{"id":"h2-78","c":"h2","g":6,"hz":"问题","py":"wèntí","pos":"n.","en":"question; problem","em":"⁉️"},{"id":"h2-79","c":"h2","g":6,"hz":"事情","py":"shìqing","pos":"n.","en":"matter; thing; affair","em":"📋"},{"id":"h2-80","c":"h2","g":6,"hz":"考试","py":"kǎoshì","pos":"n.","en":"exam; test","em":"🧾"},{"id":"h2-81","c":"h2","g":6,"hz":"票","py":"piào","pos":"n.","en":"ticket","em":"🎟️"},{"id":"h2-82","c":"h2","g":6,"hz":"意思","py":"yìsi","pos":"n.","en":"meaning","em":"🧠"},{"id":"h2-83","c":"h2","g":6,"hz":"颜色","py":"yánsè","pos":"n.","en":"colour; color","em":"🎨"},{"id":"h2-84","c":"h2","g":6,"hz":"铅笔","py":"qiānbǐ","pos":"n.","en":"pencil","em":"✏️"},{"id":"h2-85","c":"h2","g":6,"hz":"面条","py":"miàntiáo","pos":"n.","en":"noodles","em":"🍜"},{"id":"h2-86","c":"h2","g":6,"hz":"火车站","py":"huǒchēzhàn","pos":"n.","en":"train station; railway station","em":"🚉"},{"id":"h2-87","c":"h2","g":6,"hz":"公司","py":"gōngsī","pos":"n.","en":"company","em":"🏢"},{"id":"h2-88","c":"h2","g":6,"hz":"宾馆","py":"bīnguǎn","pos":"n.","en":"hotel","em":"🏨"},{"id":"h2-89","c":"h2","g":7,"hz":"说话","py":"shuōhuà","pos":"v.","en":"to speak; to talk","em":"🗣️"},{"id":"h2-90","c":"h2","g":7,"hz":"卖","py":"mài","pos":"v.","en":"to sell","em":"💸"},{"id":"h2-91","c":"h2","g":7,"hz":"问","py":"wèn","pos":"v.","en":"to ask","em":"🙋"},{"id":"h2-92","c":"h2","g":7,"hz":"走","py":"zǒu","pos":"v.","en":"to walk; to leave","em":"🚶"},{"id":"h2-93","c":"h2","g":7,"hz":"进","py":"jìn","pos":"v.","en":"to enter; to come in","em":"📥"},{"id":"h2-94","c":"h2","g":7,"hz":"出","py":"chū","pos":"v.","en":"to go out; to come out","em":"📤"},{"id":"h2-95","c":"h2","g":7,"hz":"跑步","py":"pǎobù","pos":"v.","en":"to run; to jog","em":"🏃"},{"id":"h2-96","c":"h2","g":7,"hz":"到","py":"dào","pos":"v.","en":"to arrive; to reach","em":"🏁"},{"id":"h2-97","c":"h2","g":7,"hz":"穿","py":"chuān","pos":"v.","en":"to wear; to put on","em":"👗"},{"id":"h2-98","c":"h2","g":7,"hz":"洗","py":"xǐ","pos":"v.","en":"to wash","em":"🧼"},{"id":"h2-99","c":"h2","g":7,"hz":"给","py":"gěi","pos":"v.","en":"to give","em":"🎁"},{"id":"h2-100","c":"h2","g":7,"hz":"找","py":"zhǎo","pos":"v.","en":"to look for; to find","em":"🔍"},{"id":"h2-101","c":"h2","g":7,"hz":"懂","py":"dǒng","pos":"v.","en":"to understand","em":"💡"},{"id":"h2-102","c":"h2","g":7,"hz":"笑","py":"xiào","pos":"v.","en":"to laugh; to smile","em":"😄"},{"id":"h2-103","c":"h2","g":7,"hz":"告诉","py":"gàosu","pos":"v.","en":"to tell","em":"📣"},{"id":"h2-104","c":"h2","g":7,"hz":"准备","py":"zhǔnbèi","pos":"v.","en":"to prepare","em":"🧳"},{"id":"h2-105","c":"h2","g":7,"hz":"开始","py":"kāishǐ","pos":"v.","en":"to begin; to start","em":"▶️"},{"id":"h2-106","c":"h2","g":7,"hz":"介绍","py":"jièshào","pos":"v.","en":"to introduce","em":"🤝"},{"id":"h2-107","c":"h2","g":7,"hz":"帮助","py":"bāngzhù","pos":"v.","en":"to help","em":"🆘"},{"id":"h2-108","c":"h2","g":7,"hz":"玩","py":"wán","pos":"v.","en":"to play; to have fun","em":"🎮"},{"id":"h2-109","c":"h2","g":7,"hz":"送","py":"sòng","pos":"v.","en":"to give (as a gift); to deliver","em":"💝"},{"id":"h2-110","c":"h2","g":7,"hz":"等","py":"děng","pos":"v.","en":"to wait","em":"⏱️"},{"id":"h2-111","c":"h2","g":7,"hz":"让","py":"ràng","pos":"v.","en":"to let; to make (someone do)","em":"👐"},{"id":"h2-112","c":"h2","g":8,"hz":"起床","py":"qǐchuáng","pos":"v.","en":"to get up","em":"⏰"},{"id":"h2-113","c":"h2","g":8,"hz":"唱歌","py":"chànggē","pos":"v.","en":"to sing","em":"🎤"},{"id":"h2-114","c":"h2","g":8,"hz":"跳舞","py":"tiàowǔ","pos":"v.","en":"to dance","em":"💃"},{"id":"h2-115","c":"h2","g":8,"hz":"旅游","py":"lǚyóu","pos":"v.","en":"to travel; to tour","em":"🗺️"},{"id":"h2-116","c":"h2","g":8,"hz":"上班","py":"shàngbān","pos":"v.","en":"to go to work","em":"👔"},{"id":"h2-117","c":"h2","g":8,"hz":"生病","py":"shēngbìng","pos":"v.","en":"to get sick; to fall ill","em":"🤒"},{"id":"h2-118","c":"h2","g":8,"hz":"休息","py":"xiūxi","pos":"v.","en":"to rest","em":"🛋️"},{"id":"h2-119","c":"h2","g":8,"hz":"运动","py":"yùndòng","pos":"v.","en":"to exercise; sport","em":"🏋️"},{"id":"h2-120","c":"h2","g":8,"hz":"游泳","py":"yóuyǒng","pos":"v.","en":"to swim","em":"🏊"},{"id":"h2-121","c":"h2","g":8,"hz":"踢足球","py":"tī zúqiú","pos":"","en":"to play football; to play soccer","em":"⚽"},{"id":"h2-122","c":"h2","g":8,"hz":"打篮球","py":"dǎ lánqiú","pos":"","en":"to play basketball","em":"🏀"},{"id":"h2-123","c":"h2","g":8,"hz":"完","py":"wán","pos":"v.","en":"to finish","em":"✅"},{"id":"h2-124","c":"h2","g":8,"hz":"觉得","py":"juéde","pos":"v.","en":"to feel; to think","em":"💭"},{"id":"h2-125","c":"h2","g":8,"hz":"知道","py":"zhīdao","pos":"v.","en":"to know (a fact)","em":"🧠"},{"id":"h2-126","c":"h2","g":8,"hz":"希望","py":"xīwàng","pos":"v.","en":"to hope; hope","em":"🌠"},{"id":"h2-127","c":"h2","g":8,"hz":"可以","py":"kěyǐ","pos":"mod.","en":"can; may","em":"🆗"},{"id":"h2-128","c":"h2","g":8,"hz":"要","py":"yào","pos":"mod.","en":"to want; will; must","em":"🎯"},{"id":"h2-129","c":"h2","g":8,"hz":"可能","py":"kěnéng","pos":"mod.","en":"maybe; possible; possibly","em":"🎲"},{"id":"h2-130","c":"h2","g":9,"hz":"高","py":"gāo","pos":"adj.","en":"tall; high","em":"🦒"},{"id":"h2-131","c":"h2","g":9,"hz":"红","py":"hóng","pos":"adj.","en":"red","em":"🟥"},{"id":"h2-132","c":"h2","g":9,"hz":"白","py":"bái","pos":"adj.","en":"white","em":"⬜"},{"id":"h2-133","c":"h2","g":9,"hz":"黑","py":"hēi","pos":"adj.","en":"black; dark","em":"⬛"},{"id":"h2-134","c":"h2","g":9,"hz":"忙","py":"máng","pos":"adj.","en":"busy","em":"😵‍💫"},{"id":"h2-135","c":"h2","g":9,"hz":"快","py":"kuài","pos":"adj.","en":"fast; quick","em":"🐇"},{"id":"h2-136","c":"h2","g":9,"hz":"慢","py":"màn","pos":"adj.","en":"slow","em":"🐢"},{"id":"h2-137","c":"h2","g":9,"hz":"远","py":"yuǎn","pos":"adj.","en":"far","em":"🔭"},{"id":"h2-138","c":"h2","g":9,"hz":"近","py":"jìn","pos":"adj.","en":"near; close","em":"📍"},{"id":"h2-139","c":"h2","g":9,"hz":"好吃","py":"hǎochī","pos":"adj.","en":"delicious; tasty","em":"😋"},{"id":"h2-140","c":"h2","g":9,"hz":"累","py":"lèi","pos":"adj.","en":"tired","em":"😩"},{"id":"h2-141","c":"h2","g":9,"hz":"长","py":"cháng","pos":"adj.","en":"long","em":"📏"},{"id":"h2-142","c":"h2","g":9,"hz":"新","py":"xīn","pos":"adj.","en":"new","em":"🆕"},{"id":"h2-143","c":"h2","g":9,"hz":"贵","py":"guì","pos":"adj.","en":"expensive","em":"💎"},{"id":"h2-144","c":"h2","g":9,"hz":"便宜","py":"piányi","pos":"adj.","en":"cheap","em":"🏷️"},{"id":"h2-145","c":"h2","g":9,"hz":"晴","py":"qíng","pos":"adj.","en":"sunny; clear","em":"🌞"},{"id":"h2-146","c":"h2","g":9,"hz":"阴","py":"yīn","pos":"adj.","en":"cloudy; overcast","em":"☁️"},{"id":"h2-147","c":"h2","g":9,"hz":"错","py":"cuò","pos":"adj.","en":"wrong","em":"❌"},{"id":"h2-148","c":"h2","g":9,"hz":"快乐","py":"kuàilè","pos":"adj.","en":"happy; joyful","em":"🥳"},{"id":"h2-149","c":"h2","g":9,"hz":"对","py":"duì","pos":"prep.","en":"to; towards","em":"➡️"},{"id":"h2-150","c":"h2","g":9,"hz":"对","py":"duì","pos":"adj.","en":"right; correct","em":"✅"}];
+const CATS = {
+  c:  {name:'Course', sub:'Lessons 1–14', groups:[...Array(14)].map((_,i)=>String(i+1)), num:true},
+  h1: {name:'HSK 1', sub:'150 words', groups:['Pronouns','Numbers & measures','Function words','Places & time','Family & people','Things','Verbs I','Verbs II','Adjectives']},
+  h2: {name:'HSK 2', sub:'150 words', groups:['Pronouns & numbers','Adverbs & conjunctions','Prepositions & particles','Places & time','Family & people','Things','Verbs I','Verbs II','Adjectives']}
+};
 const DAY = 864e5, NEW_PER_SESSION = 15, KEY = 'hsk1-cards-v1';
 
 const store = {
@@ -156,8 +220,10 @@ const store = {
   set(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)); }catch(e){} }
 };
 let saved = store.get();
-let srs = saved.srs || {};          // id -> {iv: days, ef, due: ms, reps}
-let settings = Object.assign({lessons:[1], mode:'review', dir:'zh'}, saved.settings || {});
+let srs = saved.srs || {};
+let settings = Object.assign({cat:'c', sel:{c:[1], h1:[1], h2:[1]}, mode:'review', dir:'zh', auto:false, qType:'en', qLen:'20', tones:true}, saved.settings || {});
+if (settings.lessons){ settings.sel = Object.assign({c:settings.lessons, h1:[1], h2:[1]}, settings.sel||{}); settings.sel.c = settings.lessons; delete settings.lessons; }
+settings.sel = Object.assign({c:[1], h1:[1], h2:[1]}, settings.sel);
 const persist = () => store.set({srs, settings});
 
 // ---------- scheduling ----------
@@ -186,72 +252,89 @@ const fmtIv = d => d === 0 ? 'again' : d < 30 ? d + 'd' : d < 365 ? Math.round(d
 const isDue = c => srs[c.id] && srs[c.id].reps > 0 && srs[c.id].due <= Date.now();
 const isNew = c => !srs[c.id] || (!srs[c.id].reps && !srs[c.id].lapse);
 
-// ---------- session ----------
-let queue = [], pos = 0, flipped = false, sessionDone = 0, sessionTotal = 0, againCount = 0;
-const inLessons = () => CARDS.filter(c => settings.lessons.includes(c.l));
-
-function buildSession(){
-  const pool = inLessons();
-  flipped = false; pos = 0; sessionDone = 0; againCount = 0;
-  if (settings.mode === 'browse'){ queue = pool.slice(); }
-  else {
-    const due = shuffle(pool.filter(isDue));
-    const lapsed = pool.filter(c => srs[c.id] && !srs[c.id].reps && srs[c.id].lapse);
-    const fresh = pool.filter(isNew).slice(0, NEW_PER_SESSION);
-    queue = [...lapsed, ...due, ...fresh];
-  }
-  sessionTotal = queue.length;
-  render();
-}
+// ---------- pools ----------
+const inCat = cat => CARDS.filter(c => c.c === cat);
+const pool = () => CARDS.filter(c => c.c === settings.cat && settings.sel[settings.cat].includes(c.g));
+const tagFor = c => c.c === 'c' ? `第${c.g}课` : `${CATS[c.c].name} · ${CATS[c.c].groups[c.g-1]}`;
 function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-// ---------- rendering ----------
+// ---------- session ----------
+let queue = [], pos = 0, flipped = false, sessionDone = 0, sessionTotal = 0, againCount = 0;
+function buildSession(){
+  flipped = false; pos = 0; sessionDone = 0; againCount = 0;
+  const p = pool();
+  if (settings.mode === 'browse') queue = p.slice();
+  else if (settings.mode === 'review'){
+    const lapsed = p.filter(c => srs[c.id] && !srs[c.id].reps && srs[c.id].lapse);
+    queue = [...lapsed, ...shuffle(p.filter(isDue)), ...p.filter(isNew).slice(0, NEW_PER_SESSION)];
+  } else queue = [];
+  sessionTotal = queue.length;
+  if (settings.mode === 'quiz') quizSetup();
+  render();
+}
+
+// ---------- helpers ----------
 const $ = id => document.getElementById(id);
-const esc = s => s.replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-const hzSize = h => ({1:128,2:104,3:80,4:64}[h.length] || 52);
+const esc = s => String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const hzLen = h => h.replace(/[^\u3400-\u9fff]/g,'').length;
+const hzSize = h => ({1:128,2:104,3:80,4:64}[hzLen(h)] || 48);
 
 function renderStats(){
-  const all = CARDS, sel = inLessons();
+  const all = inCat(settings.cat), sel = pool();
   const learned = all.filter(c => srs[c.id] && srs[c.id].reps > 0).length;
-  const due = sel.filter(isDue).length;
-  const fresh = sel.filter(isNew).length;
-  $('stats').innerHTML = `<span class="due"><b>${due}</b> due</span><span><b>${fresh}</b> new</span><span><b>${learned}</b>/${all.length} learned</span>`;
+  $('stats').innerHTML = `<span class="due"><b>${sel.filter(isDue).length}</b> due</span><span><b>${sel.filter(isNew).length}</b> new</span><span><b>${learned}</b>/${all.length} learned</span>`;
 }
-function renderLessons(){
-  const el = $('lessons'); el.innerHTML = '';
-  const allOn = settings.lessons.length === 14;
+function renderCats(){
+  $('cats').innerHTML = Object.entries(CATS).map(([k,v]) => {
+    const due = inCat(k).filter(isDue).length;
+    return `<button type="button" class="cat" data-k="${k}" aria-pressed="${settings.cat===k}"><b>${v.name}</b><span>${due ? due + ' due' : v.sub}</span></button>`;
+  }).join('');
+  $('cats').querySelectorAll('.cat').forEach(b => b.onclick = () => { settings.cat = b.dataset.k; persist(); renderCats(); renderGroups(); buildSession(); });
+}
+function renderGroups(){
+  const cat = CATS[settings.cat], el = $('groups'), sel = settings.sel[settings.cat];
+  $('grpLbl').textContent = cat.num ? 'Lessons' : 'Groups';
+  el.className = 'groups' + (cat.num ? ' num' : '');
+  el.innerHTML = '';
+  const n = cat.groups.length, allOn = sel.length === n;
   const mk = (txt, on, fn, title) => { const b = document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=txt; b.setAttribute('aria-pressed', on); if(title) b.title=title; b.onclick=fn; el.appendChild(b); };
-  for (let i=1;i<=14;i++){
-    const n = CARDS.filter(c=>c.l===i).length;
-    mk(i, settings.lessons.includes(i), () => {
-      const s = new Set(settings.lessons);
-      s.has(i) ? s.delete(i) : s.add(i);
-      if (!s.size) s.add(i);
-      settings.lessons = [...s].sort((a,b)=>a-b); persist(); renderLessons(); buildSession();
-    }, `Lesson ${i} · ${n} words`);
-  }
-  mk('All', allOn, () => { settings.lessons = allOn ? [1] : [...Array(14)].map((_,i)=>i+1); persist(); renderLessons(); buildSession(); });
+  cat.groups.forEach((label, i) => {
+    const g = i + 1, cnt = CARDS.filter(c => c.c === settings.cat && c.g === g).length;
+    mk(label, sel.includes(g), () => {
+      const s = new Set(sel); s.has(g) ? s.delete(g) : s.add(g); if (!s.size) s.add(g);
+      settings.sel[settings.cat] = [...s].sort((a,b)=>a-b); persist(); renderGroups(); buildSession();
+    }, `${cnt} words`);
+  });
+  mk('All', allOn, () => { settings.sel[settings.cat] = allOn ? [1] : cat.groups.map((_,i)=>i+1); persist(); renderGroups(); buildSession(); });
 }
-function setSeg(id, key){
+function setSeg(id, key, after){
   [...$(id).children].forEach(b => {
-    b.setAttribute('aria-pressed', b.dataset.v === settings[key]);
-    b.onclick = () => { settings[key] = b.dataset.v; persist(); setSeg(id, key); key==='mode' ? buildSession() : render(); };
+    b.setAttribute('aria-pressed', String(b.dataset.v) === String(settings[key]));
+    b.onclick = () => { settings[key] = b.dataset.v; persist(); setSeg(id, key, after); after(); };
   });
 }
 
-function faceZh(c){ return `<span class="tag">第${c.l}课</span><div class="emoji">${c.em}</div><div class="hz" style="font-size:${hzSize(c.hz)}px">${esc(c.hz)}</div><span class="hint">Tap or press Space to flip</span>`; }
-function faceEn(c){ return `<span class="tag">Lesson ${c.l}</span><div class="emoji">${c.em}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en big">${esc(c.en)}</div><span class="hint">Say it in Chinese, then flip</span>`; }
-function answerZh(c){ return `<span class="tag">第${c.l}课</span><span class="tag r">${esc(c.hz)}</span><div class="py">${esc(c.py)}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en">${esc(c.en)}</div>${speakBtn()}`; }
-function answerEn(c){ return `<span class="tag">Lesson ${c.l}</span><div class="hz" style="font-size:${Math.round(hzSize(c.hz)*.8)}px">${esc(c.hz)}</div><div class="py">${esc(c.py)}</div><div class="en">${esc(c.en)}</div>${speakBtn()}`; }
+// ---------- card faces ----------
 const speakBtn = () => `<span class="speak" role="button" tabindex="0" data-speak>🔊 Hear it <span class="keys">· S</span></span>`;
+function faceZh(c){ return `<span class="tag">${esc(tagFor(c))}</span><div class="emoji">${c.em}</div><div class="hz" style="font-size:${hzSize(c.hz)}px">${esc(c.hz)}</div><span class="hint">Tap or press Space to flip</span>`; }
+function faceEn(c){ return `<span class="tag">${esc(tagFor(c))}</span><div class="emoji">${c.em}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en big">${esc(c.en)}</div><span class="hint">Say it in Chinese, then flip</span>`; }
+function answerZh(c){ return `<span class="tag">${esc(tagFor(c))}</span><span class="tag r">${esc(c.hz)}</span><div class="py">${esc(c.py)}</div>${c.pos?`<div class="pos">${esc(c.pos)}</div>`:''}<div class="en">${esc(c.en)}</div>${speakBtn()}`; }
+function answerEn(c){ return `<span class="tag">${esc(tagFor(c))}</span><div class="hz" style="font-size:${Math.round(hzSize(c.hz)*.8)}px">${esc(c.hz)}</div><div class="py">${esc(c.py)}</div><div class="en">${esc(c.en)}</div>${speakBtn()}`; }
 
+// ---------- render ----------
 function render(){
   renderStats();
+  const quiz = settings.mode === 'quiz';
+  $('cardOpts').hidden = quiz; $('quizOpts').hidden = !quiz;
+  $('toneBtn').hidden = settings.qType !== 'py';
+  if (quiz){ $('studyArea').hidden = true; $('doneArea').hidden = true; $('controls').innerHTML = ''; $('quizArea').hidden = false; renderQuiz(); return; }
+  $('quizArea').hidden = true;
+
   const remaining = queue.length - pos;
-  const finished = settings.mode === 'review' ? remaining <= 0 : false;
+  const finished = settings.mode === 'review' && remaining <= 0;
   $('studyArea').hidden = finished || !queue.length;
   $('doneArea').hidden = !(finished || !queue.length);
-  const pct = settings.mode === 'browse' ? (queue.length ? (pos+1)/queue.length : 0) : (sessionTotal ? sessionDone/ (sessionDone + Math.max(remaining,0)) : 1);
+  const pct = settings.mode === 'browse' ? (queue.length ? (pos+1)/queue.length : 0) : (sessionTotal ? sessionDone/(sessionDone + Math.max(remaining,0)) : 1);
   $('bar').style.width = (pct*100).toFixed(1) + '%';
 
   if (!queue.length || finished){ renderDone(); $('controls').innerHTML=''; $('metaL').textContent=''; $('metaR').textContent=''; return; }
@@ -271,8 +354,7 @@ function render(){
       <button class="btn" type="button" id="next" ${pos>=queue.length-1?'disabled':''}>Next →</button></div>`;
     $('prev').onclick = () => go(-1); $('next').onclick = () => go(1); $('flipB').onclick = flip;
   } else {
-    const st = isNew(c) ? 'New card' : (srs[c.id]?.lapse && !srs[c.id].reps ? 'Relearning' : 'Review');
-    $('metaL').textContent = `${st}`;
+    $('metaL').textContent = isNew(c) ? 'New card' : (srs[c.id]?.lapse && !srs[c.id].reps ? 'Relearning' : 'Review');
     $('metaR').textContent = `${remaining} left in session`;
     if (!flipped){
       $('controls').innerHTML = `<div class="grade"><button class="btn good wide" type="button" id="show">Show answer <span class="keys">· Space</span></button></div>`;
@@ -285,31 +367,29 @@ function render(){
   }
 }
 function renderDone(){
-  const sel = inLessons();
-  const nextDue = sel.filter(c=>srs[c.id]?.reps).map(c=>srs[c.id].due).sort((a,b)=>a-b)[0];
-  const moreNew = sel.filter(isNew).length;
-  let msg;
-  if (sessionTotal && sessionDone) msg = `${sessionDone} cards reviewed${againCount?`, ${againCount} missed and re-drilled`:''}.`;
-  else msg = 'Nothing is due in the selected lessons right now.';
+  const p = pool();
+  const nextDue = p.filter(c=>srs[c.id]?.reps).map(c=>srs[c.id].due).sort((a,b)=>a-b)[0];
+  const moreNew = p.filter(isNew).length;
+  const msg = (sessionTotal && sessionDone) ? `${sessionDone} cards reviewed${againCount?`, ${againCount} missed and re-drilled`:''}.` : 'Nothing is due in the selected groups right now.';
   const when = nextDue ? `Next card is due ${nextDue <= Date.now() ? 'now' : new Date(nextDue).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'})}.` : '';
   $('doneArea').innerHTML = `<div class="done"><div class="big">好！</div><p>${msg} ${when}</p>
-    ${moreNew ? `<button class="btn good wide" type="button" id="more" style="max-width:280px">Learn ${Math.min(NEW_PER_SESSION, moreNew)} more new words</button>` : `<p>Every word in these lessons has been started. Add another lesson above to keep going.</p>`}</div>`;
-  if (moreNew) $('more').onclick = () => { queue = sel.filter(isNew).slice(0, NEW_PER_SESSION); pos=0; sessionTotal=queue.length; sessionDone=0; againCount=0; flipped=false; render(); };
+    ${moreNew ? `<button class="btn good wide" type="button" id="more" style="max-width:280px">Learn ${Math.min(NEW_PER_SESSION, moreNew)} more new words</button>` : `<p>Every word in these groups has been started. Add another group above to keep going.</p>`}</div>`;
+  if (moreNew) $('more').onclick = () => { queue = p.filter(isNew).slice(0, NEW_PER_SESSION); pos=0; sessionTotal=queue.length; sessionDone=0; againCount=0; flipped=false; render(); };
 }
 
-function flip(){ flipped = !flipped; render(); if (flipped && autoSpeakOn()) speak(queue[pos]); if (flipped) preload(); }
+function flip(){ flipped = !flipped; render(); if (flipped && settings.auto) speak(queue[pos]); }
 function go(d){ pos = Math.min(queue.length-1, Math.max(0, pos+d)); flipped=false; render(); }
 function answer(g){
   const c = queue[pos];
   grade(c.id, g);
-  if (g === 0){ againCount++; const at = Math.min(queue.length, pos + 4); queue.splice(at, 0, c); }
+  if (g === 0){ againCount++; queue.splice(Math.min(queue.length, pos + 4), 0, c); }
   else sessionDone++;
-  pos++; flipped = false; render();
+  pos++; flipped = false; renderCats(); render();
 }
 
-// ---------- audio (pre-recorded mp3 per card; device voice only as fallback) ----------
+// ---------- audio ----------
 const player = new Audio(); player.preload = 'auto';
-let voiceOK = true;
+let playBtnRef = null;
 function deviceSpeak(c){
   try{
     const vs = speechSynthesis.getVoices();
@@ -321,23 +401,162 @@ function deviceSpeak(c){
 }
 function speak(c){
   if (!c) return;
+  const pb = $('playBtn'); if (pb){ pb.classList.remove('playing'); void pb.offsetWidth; pb.classList.add('playing'); }
   try{
     player.pause(); player.src = 'audio/' + c.id + '.mp3'; player.currentTime = 0;
+    player.onerror = () => deviceSpeak(c);
     const pr = player.play(); if (pr && pr.catch) pr.catch(() => deviceSpeak(c));
   }catch(e){ deviceSpeak(c); }
 }
-player.addEventListener('error', () => { if (queue[pos]) deviceSpeak(queue[pos]); });
-const autoSpeakOn = () => !!settings.auto;
-function preload(){ const n = queue[pos+1]; if (n){ const a = new Audio(); a.preload='auto'; a.src='audio/'+n.id+'.mp3'; } }
 
+// ---------- quiz ----------
+let qz = {phase:'setup', list:[], i:0, res:[], answered:false};
+const quizEligible = () => pool().filter(c => c.pos !== 'part.' && !(settings.qType === 'en' && /measure word|particle/.test(c.en)));
+function quizSetup(){ qz = {phase:'setup', list:[], i:0, res:[], answered:false}; }
+function quizStart(list){
+  const n = +settings.qLen;
+  qz = {phase:'q', list: list || shuffle(quizEligible().slice()).slice(0, n || undefined), i:0, res:[], answered:false};
+  render(); speak(qz.list[0]); focusInput();
+}
+const focusInput = () => setTimeout(() => { const i = $('qIn'); if (i) i.focus(); }, 30);
+const TYPE = {en:{word:'English meaning', ph:'Type the English meaning'}, py:{word:'pinyin', ph:'e.g. ni3hao3 or nǐhǎo'}, hz:{word:'characters', ph:'Type 汉字 (Chinese keyboard)'}};
+
+function renderQuiz(){
+  const A = $('quizArea'), total = qz.list.length;
+  if (qz.phase === 'setup'){
+    const n = quizEligible().length, len = +settings.qLen ? Math.min(+settings.qLen, n) : n;
+    $('bar').style.width = '0%'; $('metaL').textContent = `${n} words available in this selection`; $('metaR').textContent = '';
+    A.innerHTML = `<div class="qcard">
+      <div class="play" aria-hidden="true" style="cursor:default">${playIcon}</div>
+      <p class="qprompt">You hear a word. No text, no picture.<br>Type its <b>${TYPE[settings.qType].word}</b>.</p>
+      ${settings.qType==='hz' ? `<p class="qprompt">Needs a Chinese (pinyin) keyboard on your device.</p>` : ''}
+      ${settings.qType==='py' ? `<p class="qprompt">Tones as marks (nǐ) or numbers (ni3). ${settings.tones ? 'Tones are checked.' : 'Tones are ignored.'}</p>` : ''}
+      <button class="btn primary wide" type="button" id="qGo" ${n?'':'disabled'} style="max-width:280px">Start ${len}-word quiz</button>
+      ${n ? '' : '<p class="qprompt">No quizzable words here. Particles are left out of the audio quiz. Pick another group.</p>'}</div>`;
+    if (n) $('qGo').onclick = () => quizStart();
+    return;
+  }
+  if (qz.phase === 'done'){
+    const ok = qz.res.filter(r=>r.ok).length, miss = qz.res.filter(r=>!r.ok);
+    $('bar').style.width = '100%'; $('metaL').textContent = 'Quiz finished'; $('metaR').textContent = '';
+    A.innerHTML = `<div class="qcard"><div class="score">${ok}/${total}</div>
+      <p class="qprompt">${miss.length ? `${miss.length} missed. Drill them again before a new set.` : 'Clean sheet.'}</p>
+      ${miss.length ? `<div class="missed">${miss.map(r=>`<div><span class="h">${esc(r.c.hz)}</span><span class="p">${esc(r.c.py)}</span><span class="e">${esc(r.c.en)}${r.input?` · you typed “${esc(r.input)}”`:''}</span></div>`).join('')}</div>` : ''}
+      <div class="qbtns">${miss.length ? `<button class="btn primary" type="button" id="qRetry">Retry ${miss.length} missed</button>` : ''}<button class="btn" type="button" id="qNew">New quiz</button></div></div>`;
+    if (miss.length) $('qRetry').onclick = () => quizStart(shuffle(miss.map(r=>r.c)));
+    $('qNew').onclick = () => { quizSetup(); render(); };
+    return;
+  }
+  const c = qz.list[qz.i], r = qz.res[qz.i];
+  const ok = qz.res.filter(x=>x.ok).length;
+  $('bar').style.width = ((qz.i + (qz.answered?1:0)) / total * 100).toFixed(1) + '%';
+  $('metaL').textContent = `Word ${qz.i+1} of ${total}`; $('metaR').textContent = `${ok} correct`;
+  const t = settings.qType;
+  A.innerHTML = `<div class="qcard ${qz.answered ? (r.ok?'ok':'bad') : ''}">
+    <button class="play" type="button" id="playBtn" aria-label="Play the word again">${playIcon}</button>
+    ${qz.answered ? `
+      <div class="verdict ${r.ok?'ok':'bad'}">${r.ok ? (r.close ? 'Correct (tones ignored)' : 'Correct') : 'Not quite'}</div>
+      <div class="reveal"><div class="hz" style="font-size:${Math.min(56, hzSize(c.hz)*.55)}px">${esc(c.hz)}</div><div class="py">${esc(c.py)}</div><div class="en">${esc(c.en)}</div></div>
+      ${!r.ok ? `<div class="yours">You typed: <s>${r.input ? esc(r.input) : '(nothing)'}</s></div>` : ''}
+      <div class="qbtns"><button class="btn primary" type="button" id="qNext">${qz.i+1 < total ? 'Next word' : 'See results'} <span class="keys">· Enter</span></button></div>
+      ${!r.ok && r.input && t !== 'hz' ? `<button class="linkbtn" type="button" id="qOverride">My answer was right, count it</button>` : ''}
+    ` : `
+      <p class="qprompt">Type the <b>${TYPE[t].word}</b></p>
+      <form class="qform" id="qForm" autocomplete="off">
+        <input id="qIn" class="${t==='hz'?'hzin':''}" placeholder="${TYPE[t].ph}" autocapitalize="off" autocorrect="off" spellcheck="false" ${t==='hz'?'lang="zh-CN"':''} aria-label="Your answer">
+        <button class="btn primary" type="submit">Check</button>
+      </form>
+      <button class="linkbtn" type="button" id="qSkip">I don't know, show me</button>`}
+  </div>`;
+  $('playBtn').onclick = () => { speak(c); if (!qz.answered) focusInput(); };
+  if (qz.answered){
+    $('qNext').onclick = quizNext; setTimeout(() => $('qNext') && $('qNext').focus(), 30);
+    if ($('qOverride')) $('qOverride').onclick = () => { r.ok = true; r.override = true; renderQuiz(); };
+  } else {
+    $('qForm').onsubmit = e => { e.preventDefault(); quizCheck($('qIn').value); };
+    $('qSkip').onclick = () => quizCheck('');
+  }
+}
+function quizCheck(input){
+  const c = qz.list[qz.i], v = input.trim();
+  let ok = false, close = false;
+  if (v){
+    if (settings.qType === 'hz') ok = checkHz(v, c);
+    else if (settings.qType === 'en') ok = checkEn(v, c);
+    else { const s = checkPy(v, c); ok = s.ok; close = s.close; }
+  }
+  qz.res[qz.i] = {c, ok, close, input: v};
+  qz.answered = true; renderQuiz();
+}
+function quizNext(){
+  if (qz.i + 1 >= qz.list.length){ qz.phase = 'done'; renderQuiz(); return; }
+  qz.i++; qz.answered = false; renderQuiz(); speak(qz.list[qz.i]); focusInput();
+}
+const playIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>`;
+
+// ---------- answer checking ----------
+const onlyHz = s => s.replace(/[^\u3400-\u9fff]/g, '');
+function checkHz(v, c){ return onlyHz(v) && onlyHz(v) === onlyHz(c.hz); }
+
+const TONES = {a:'āáǎà', e:'ēéěè', i:'īíǐì', o:'ōóǒò', u:'ūúǔù', 'ü':'ǖǘǚǜ'};
+function markSyl(s, t){
+  if (!(t >= 1 && t <= 4)) return s;
+  let idx = s.indexOf('a'); if (idx < 0) idx = s.indexOf('e');
+  if (idx < 0 && s.includes('ou')) idx = s.indexOf('o');
+  if (idx < 0){ for (let k = s.length-1; k >= 0; k--) if ('aeiouü'.includes(s[k])){ idx = k; break; } }
+  if (idx < 0) return s;
+  return s.slice(0, idx) + TONES[s[idx]][t-1] + s.slice(idx+1);
+}
+function pyNorm(s){
+  s = s.normalize('NFC').toLowerCase().replace(/u:/g,'ü').replace(/v/g,'ü');
+  s = s.replace(/([a-zü]+)([0-5])/g, (_, syl, t) => markSyl(syl, +t));
+  return s.replace(/[^a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/g, '');
+}
+const stripTones = s => s.normalize('NFD').replace(/[\u0300\u0301\u0304\u030C]/g, '').normalize('NFC');
+function sandhi(s, c){
+  if (c.hz.includes('一')) s = s.replace(/y[īíì]/g, 'yī');
+  if (c.hz.includes('不')) s = s.replace(/b[úù]/g, 'bù');
+  return s;
+}
+function checkPy(v, c){
+  const inp = sandhi(pyNorm(v), c);
+  const opts = c.py.split('/').map(o => sandhi(pyNorm(o), c));
+  if (opts.includes(inp)) return {ok:true};
+  if (opts.map(stripTones).includes(stripTones(inp))) return settings.tones ? {ok:false} : {ok:true, close:true};
+  return {ok:false};
+}
+function enNorm(s){
+  return s.toLowerCase().replace(/[’']/g,"'").replace(/[^a-z0-9' ]/g,' ').replace(/\s+/g,' ').trim()
+    .replace(/^(to be |to |a |an |the )/,'').trim();
+}
+function enOptions(en){
+  const out = new Set();
+  en.split(/[;,/]/).forEach(part => {
+    const p = part.replace(/["“”]/g,'');
+    [p.replace(/\([^)]*\)/g,''), p.replace(/[()]/g,'')].forEach(x => { const n = enNorm(x); if (n) out.add(n); });
+  });
+  return [...out];
+}
+function lev(a, b){
+  const m = a.length, n = b.length; if (Math.abs(m-n) > 2) return 9;
+  let prev = Array.from({length:n+1}, (_,j)=>j);
+  for (let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a[i-1]===b[j-1]?0:1)); prev=cur; }
+  return prev[n];
+}
+function checkEn(v, c){
+  const inp = enNorm(v); if (!inp) return false;
+  return enOptions(c.en).some(o => o === inp || (inp.length >= 5 && lev(o, inp) <= 1) || (inp.length >= 9 && lev(o, inp) <= 2));
+}
+
+// ---------- events ----------
 document.addEventListener('click', e => {
   const sp = e.target.closest('[data-speak]');
-  if (sp){ e.stopPropagation(); speak(queue[pos]); return; }
+  if (sp){ e.stopPropagation(); speak(queue[pos]); }
 }, true);
 $('card').addEventListener('click', flip);
-
 document.addEventListener('keydown', e => {
   if (e.target.closest('input,textarea')) return;
+  if (settings.mode === 'quiz') return;
   if (!queue.length || $('studyArea').hidden) return;
   if (e.code === 'Space' || e.key === 'Enter'){ if (e.target.tagName === 'BUTTON') return; e.preventDefault(); flip(); }
   else if (settings.mode === 'review' && flipped && '1234'.includes(e.key)) answer(+e.key - 1);
@@ -345,30 +564,30 @@ document.addEventListener('keydown', e => {
   else if (settings.mode === 'browse' && e.key === 'ArrowLeft') go(-1);
   else if (e.key === 's' || e.key === 'S') speak(queue[pos]);
 });
-
-// swipe on touch: left = next/good, right = prev/again (only after flip in review)
 let tx = null;
 $('card').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
 $('card').addEventListener('touchend', e => {
   if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
-  if (Math.abs(dx) < 60) return;
-  if (settings.mode === 'browse') go(dx < 0 ? 1 : -1);
+  if (Math.abs(dx) >= 60 && settings.mode === 'browse') go(dx < 0 ? 1 : -1);
 });
 
-// ---------- reset (inline confirm) ----------
 function bindReset(){
   $('resetBtn').onclick = () => {
     $('resetWrap').innerHTML = `<span class="warn">Erase all progress?</span> <button type="button" id="yes">Erase</button> · <button type="button" id="no">Keep</button>`;
-    $('yes').onclick = () => { srs = {}; persist(); restoreReset(); buildSession(); };
+    $('yes').onclick = () => { srs = {}; persist(); restoreReset(); renderCats(); buildSession(); };
     $('no').onclick = restoreReset;
   };
 }
 function restoreReset(){ $('resetWrap').innerHTML = `<button type="button" id="resetBtn">Reset progress</button>`; bindReset(); }
 bindReset();
 
-$('autoBtn').setAttribute('aria-pressed', !!settings.auto); $('autoBtn').onclick = () => { settings.auto = !settings.auto; persist(); $('autoBtn').setAttribute('aria-pressed', settings.auto); };
-renderLessons(); setSeg('mode','mode'); setSeg('dir','dir'); buildSession();
+const togg = (id, key, label) => { const b = $(id); b.setAttribute('aria-pressed', !!settings[key]); b.onclick = () => { settings[key] = !settings[key]; persist(); b.setAttribute('aria-pressed', settings[key]); if (key === 'tones' && settings.mode === 'quiz' && qz.phase === 'setup') renderQuiz(); }; };
+togg('autoBtn', 'auto'); togg('toneBtn', 'tones');
+setSeg('mode', 'mode', buildSession);
+setSeg('dir', 'dir', render);
+setSeg('qType', 'qType', () => { quizSetup(); render(); });
+setSeg('qLen', 'qLen', () => { quizSetup(); render(); });
+renderCats(); renderGroups(); buildSession();
+if ('serviceWorker' in navigator){ window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{})); }
 </script>
-
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
 </body></html>
